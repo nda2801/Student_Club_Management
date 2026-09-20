@@ -1,0 +1,44 @@
+@startuml activity_ai_matching
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+
+|Trưởng ban (Leader)|
+start
+:Bấm nút 'AI Gợi ý Phân công';
+
+|Flask Backend & AI Engine|
+:Truy vấn Task chưa gán & Member Profile (Skill Matrix, Free Slots);
+:Xây dựng System Instructions & User Context Prompt;
+
+if (Có kết nối Internet & API Key hợp lệ?) then (Có)
+    :Gửi Request đến Cloud LLM (Google Gemini API);
+    if (Cloud LLM phản hồi thành công?) then (Thành công)
+        :Parse & Validate JSON qua Pydantic Schema;
+        :Ghi log engine='google_gemini';
+    else (Timeout / Lỗi Quota 429)
+        :Chuyển sang Local Rule-based Fallback Engine;
+        :Thuật toán Heuristic: So khớp Skill + Slot rảnh;
+        :Ghi log engine='local_rule_fallback';
+    endif
+else (Mất mạng / Không có Key)
+    :Kích hoạt ngay Local Rule-based Fallback Engine (< 100ms);
+    :Ghi log engine='local_rule_fallback';
+endif
+
+:Trả về bảng danh sách ghép cặp Task - Member kèm Match Score %;
+
+|Trưởng ban (Leader)|
+:Hiển thị bảng đề xuất trên React UI;
+if (Cần chỉnh sửa nhân sự?) then (Có)
+    :Trực tiếp đổi thành viên phụ trách;
+endif
+:Bấm 'Xác nhận Phân công';
+
+|Flask Backend & AI Engine|
+:Lưu các bản ghi vào bảng tasks & task_assignments;
+:Cập nhật trạng thái Kanban Board;
+
+stop
+@enduml

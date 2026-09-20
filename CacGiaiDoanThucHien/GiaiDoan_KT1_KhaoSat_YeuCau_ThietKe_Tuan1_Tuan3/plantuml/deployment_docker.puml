@@ -1,0 +1,77 @@
+@startuml deployment_docker
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+
+skinparam node {
+    BackgroundColor #F8FAFC
+    BorderColor #64748B
+    FontColor #0F172A
+}
+
+skinparam component {
+    BackgroundColor #EFF6FF
+    BorderColor #3B82F6
+    FontColor #1E3A8A
+}
+
+skinparam database {
+    BackgroundColor #FEF3C7
+    BorderColor #F59E0B
+    FontColor #78350F
+}
+
+title **BIỂU ĐỒ TRIỂN KHAI & THÀNH PHẦN (UML DEPLOYMENT & COMPONENT DIAGRAM)\nKIẾN TRÚC CONTAINER HÓA BẰNG DOCKER COMPOSE**
+
+node "Thiết bị Người dùng (Client Device)" {
+    component "Web Browser Máy tính\n(Admin/Leader Dashboard)" as DesktopBrowser
+    component "Web Browser Di động\n(Member QR Scanner & Portal)" as MobileBrowser
+}
+
+node "Máy chủ Ứng dụng (Host Machine / Docker Engine)" {
+
+    node "Docker Container: frontend\n(Port 3000:80)" as C_Frontend {
+        component "Nginx Web Server\n(Alpine Linux)" as Nginx
+        component "React 18 + Vite SPA\n(CSS Component System)" as ReactApp
+        Nginx --> ReactApp : Phục vụ Static Bundle
+    }
+
+    node "Docker Container: backend\n(Port 5000:5000)" as C_Backend {
+        component "Gunicorn WSGI Server\n(4 Workers)" as Gunicorn
+        component "Flask 3.1 RESTful API\n(Blueprints & Controllers)" as FlaskApp
+        component "JWT Auth & RBAC Middleware" as AuthMid
+        component "Pydantic V2 Schemas Validator" as Pydantic
+        component "SQLAlchemy 2.0 ORM Engine" as SQLAlchemy
+        component "Local Rule Fallback Matcher" as Fallback
+        
+        Gunicorn --> FlaskApp
+        FlaskApp --> AuthMid
+        FlaskApp --> Pydantic
+        FlaskApp --> SQLAlchemy
+        FlaskApp --> Fallback
+    }
+
+    node "Docker Container: db\n(Port 5432:5432)" as C_DB {
+        database "PostgreSQL 16 Engine" as Postgres
+        storage "Docker Named Volume: pgdata" as DBVolume
+        Postgres --> DBVolume : Persistent Data Storage
+    }
+}
+
+cloud "Google Cloud Platform / OpenAI" {
+    component "Google Gemini 1.5 Flash / Pro API\n(REST HTTPS :443)" as GeminiAPI
+    component "OpenAI GPT-4o-mini API\n(Backup REST HTTPS :443)" as OpenAIAPI
+}
+
+DesktopBrowser --> Nginx : HTTP/HTTPS (Port 3000)
+MobileBrowser --> Nginx : HTTP/HTTPS (Port 3000)
+
+ReactApp --> Gunicorn : RESTful JSON API (Port 5000)
+SQLAlchemy --> Postgres : TCP/IP Wire Protocol (Port 5432)
+
+FlaskApp --> GeminiAPI : HTTPS REST Request (Port 443)
+FlaskApp --> OpenAIAPI : HTTPS REST Request (Port 443)
+
+@enduml

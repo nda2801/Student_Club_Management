@@ -1,0 +1,31 @@
+@startuml painpoint_to_solution
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+
+rectangle "Khảo sát Thực trạng (Pain Points - Tuần 1)" as PainPoints #FEE2E2 {
+    rectangle "Phân công thủ công, sai kỹ năng & trùng lịch" as P1
+    rectangle "Điểm danh giấy chậm, dễ gian lận" as P2
+    rectangle "Quản lý task phân tán qua chat, trễ hạn" as P3
+    rectangle "Viết bài truyền thông tốn thời gian" as P4
+    rectangle "Tóm tắt báo cáo & phản hồi rời rạc" as P5
+    rectangle "Đánh giá đóng góp cảm tính" as P6
+}
+
+rectangle "Giải pháp Chức năng (SRS Requirements - Tuần 2)" as Solutions #DCFCE7 {
+    rectangle "FR-SYS-02 Skill Matrix + FR-AI-03 AI Matchmaking" as S1
+    rectangle "FR-SYS-04 Dynamic QR Check-in System" as S2
+    rectangle "FR-SYS-05 Kanban Task Board + RBAC" as S3
+    rectangle "FR-AI-01 AI Event Announcement Generator" as S4
+    rectangle "FR-AI-02 AI Activity & Feedback Summarizer" as S5
+    rectangle "FR-SYS-06 Contribution Score & Leaderboard" as S6
+}
+
+P1 --> S1
+P2 --> S2
+P3 --> S3
+P4 --> S4
+P5 --> S5
+P6 --> S6
+@enduml

@@ -1,0 +1,51 @@
+@startuml screenflow_diagram
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam state {
+    BackgroundColor #F8FAFC
+    BorderColor #2563EB
+    FontColor #0F172A
+    ArrowColor #1D4ED8
+}
+
+title **SƠ ĐỒ PHÂN LUỒNG MÀN HÌNH ỨNG DỤNG (SCREEN FLOW DIAGRAM)\nHỆ THỐNG QUẢN LÝ CÂU LẠC BỘ SINH VIÊN TÍCH HỢP AI (REACT-VITE SPA)**
+
+state "<b>SCR-01: Màn hình Đăng nhập</b>\n---\n* Email & Mật khẩu Bcrypt\n* Xác thực JWT Access Token\n* Điều hướng theo Vai trò (RBAC)" as SCR01 #FEF3C7
+state "<b>SCR-02: Dashboard Tổng quan</b>\n---\n* KPI Chỉ số CLB (Thành viên, Sự kiện, Task)\n* Thông báo & Lịch hoạt động tuần\n* Thanh điều hướng Sidebar chính" as SCR02 #DBEAFE
+state "<b>SCR-03: Quản lý Thành viên</b>\n---\n* Danh sách thành viên & Lọc Ban\n* Ma trận Kỹ năng (Skill Matrix)\n* Lịch rảnh cá nhân (Free Slots)\n* Cập nhật Profile (Pydantic Schema)" as SCR03 #E0E7FF
+state "<b>SCR-04: Quản lý Ban Chuyên môn</b>\n---\n* Danh sách 4 Ban chuyên môn\n* Bổ nhiệm / Miễn nhiệm Trưởng ban\n* Điều chuyển nhân sự giữa các ban" as SCR04 #F3E8FF
+state "<b>SCR-05: Quản lý Sự kiện & QR</b>\n---\n* Tạo & Lên lịch sự kiện\n* Trình chiếu QR Check-in độc bản\n* Quét QR điểm danh qua Web Cam/Mobile\n* Thống kê tỷ lệ tham gia realtime" as SCR05 #D1FAE5
+state "<b>SCR-06: Bảng Nhiệm vụ Kanban</b>\n---\n* Trực quan hóa 3 cột: To-Do, In-Progress, Done\n* Kéo thả cập nhật trạng thái (RBAC check)\n* Gán Deadline & Kỹ năng yêu cầu" as SCR06 #FEE2E2
+state "<b>SCR-07: AI Hub - Smart Matchmaking</b>\n---\n* Gợi ý phân công nhiệm vụ tự động\n* Tính toán Match Score % (Skills + Free Time)\n* Dual-Engine Fallback (Gemini / Rule Engine)\n* Leader phê duyệt 1-click" as SCR07 #CCFBF1
+state "<b>SCR-08: AI Hub - Generator & Summary</b>\n---\n* Sinh bài đăng truyền thông sự kiện (Multi-tone)\n* Tóm tắt báo cáo hoạt động 3 phần\n* Sao chép & Xuất bản nhanh" as SCR08 #EDE9FE
+
+[*] --> SCR01 : Khởi động ứng dụng
+
+SCR01 --> SCR02 : Đăng nhập thành công (Cấp JWT Token)
+
+SCR02 --> SCR03 : Chọn 'Quản lý Thành viên'
+SCR03 --> SCR02 : Quay lại Dashboard
+
+SCR02 --> SCR04 : Chọn 'Ban Chuyên môn'
+SCR04 --> SCR02 : Quay lại Dashboard
+
+SCR02 --> SCR05 : Chọn 'Sự kiện & Điểm danh'
+SCR05 --> SCR02 : Quay lại Dashboard
+
+SCR02 --> SCR06 : Chọn 'Bảng Nhiệm vụ Kanban'
+SCR06 --> SCR02 : Quay lại Dashboard
+
+SCR06 --> SCR07 : Nhấp 'AI Gợi ý Phân công'
+SCR07 --> SCR06 : Phê duyệt & Cập nhật Task
+
+SCR05 --> SCR08 : Nhấp 'AI Sinh thông báo / Tóm tắt'
+SCR08 --> SCR05 : Áp dụng nội dung bài đăng
+
+SCR02 --> SCR01 : Đăng xuất (Thu hồi JWT Token)
+
+@enduml

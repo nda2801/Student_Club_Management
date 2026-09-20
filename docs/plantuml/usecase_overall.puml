@@ -1,0 +1,125 @@
+@startuml usecase_overall
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 10
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+skinparam package {
+    BackgroundColor #F8FAFC
+    BorderColor #94A3B8
+    FontColor #0F172A
+    FontStyle bold
+}
+
+skinparam usecase {
+    BackgroundColor #EFF6FF
+    BorderColor #3B82F6
+    FontColor #1E3A8A
+    ArrowColor #2563EB
+}
+
+skinparam actor {
+    BackgroundColor #DBEAFE
+    BorderColor #1D4ED8
+    FontColor #1E293B
+}
+
+left to right direction
+title **HỆ THỐNG QUẢN LÝ CÂU LẠC BỘ SINH VIÊN CÓ TÍCH HỢP AI (ĐỀ TÀI 28)\nBIỂU ĐỒ USE CASE TỔNG THỂ HỆ THỐNG**
+
+' ==========================================
+' ACTORS
+' ==========================================
+actor "Người dùng chung\n(Authenticated User)" as User <<Abstract>>
+actor "Ban Chủ nhiệm\n(Admin)" as Admin
+actor "Trưởng ban\n(Leader)" as Leader
+actor "Thành viên\n(Member)" as Member
+actor "Dịch vụ AI Ngoài\n(Gemini / OpenAI API)" as AIService <<System>>
+
+' Actor Inheritance
+Admin -up-|> User
+Leader -up-|> User
+Member -up-|> User
+
+' ==========================================
+' SUBSYSTEM PACKAGES & USE CASES
+' ==========================================
+rectangle "Hệ Thống Quản Lý Câu Lạc Bộ Sinh Viên Tích Hợp AI" {
+
+    package "Phân hệ 1: Xác thực & Phân quyền (Auth & RBAC)" {
+        usecase "UC01: Đăng nhập & Xác thực JWT" as UC01
+        usecase "UC12: Quản trị & Phân quyền Tài khoản" as UC12
+        usecase "Xác thực JWT & Kiểm tra Phân quyền" as UC_Auth <<Include>>
+    }
+
+    package "Phân hệ 2: Quản lý Thành viên & Ban Chuyên môn" {
+        usecase "UC02: Cập nhật Hồ sơ, Skill & Free Slots" as UC02
+        usecase "UC11: Quản lý Cơ cấu Ban Chuyên môn" as UC11
+    }
+
+    package "Phân hệ 3: Quản lý Sự kiện & Điểm danh QR" {
+        usecase "UC04: Quản lý Sự kiện & Sinh mã QR" as UC04
+        usecase "UC09: Quét mã QR Điểm danh" as UC09
+        usecase "Sinh chuỗi QR độc bản (UUID)" as UC_GenQR <<Include>>
+    }
+
+    package "Phân hệ 4: Quản lý Nhiệm vụ & Kanban Board" {
+        usecase "UC05: Quản lý Nhiệm vụ & Kanban Board" as UC05
+        usecase "UC10: Cập nhật Tiến độ Task của mình" as UC10
+        usecase "Kiểm soát RBAC sửa Task (Chặn 403)" as UC_RBAC <<Include>>
+    }
+
+    package "Phân hệ 5: Trợ lý AI & Báo cáo Thống kê" {
+        usecase "UC06: AI Gợi ý Phân công Nhiệm vụ" as UC06
+        usecase "UC07: AI Sinh Bài đăng Thông báo" as UC07
+        usecase "UC08: AI Tóm tắt Kết quả Hoạt động" as UC08
+        usecase "UC03: Tra cứu Lịch sử & Bảng xếp hạng" as UC03
+        usecase "So khớp Kỹ năng & Fallback Rule" as UC_Match <<Include>>
+        usecase "Tính điểm Contribution Score" as UC_Score <<Include>>
+    }
+}
+
+' ==========================================
+' RELATIONSHIPS & ASSOCIATIONS
+' ==========================================
+
+' General User
+User --> UC01
+User --> UC03
+
+' Member
+Member --> UC02
+Member --> UC09
+Member --> UC10
+
+' Leader
+Leader --> UC04
+Leader --> UC05
+Leader --> UC06
+Leader --> UC07
+Leader --> UC08
+
+' Admin
+Admin --> UC11
+Admin --> UC12
+
+' Include Relationships
+UC04 ..> UC_GenQR : <<include>>
+UC09 ..> UC_Auth : <<include>>
+UC10 ..> UC_RBAC : <<include>>
+UC06 ..> UC_Match : <<include>>
+UC03 ..> UC_Score : <<include>>
+
+' Extend Relationships
+UC05 <.. UC06 : <<extend>>
+UC04 <.. UC07 : <<extend>>
+UC04 <.. UC08 : <<extend>>
+
+' AI Service interactions
+AIService <-- UC06
+AIService <-- UC07
+AIService <-- UC08
+
+@enduml

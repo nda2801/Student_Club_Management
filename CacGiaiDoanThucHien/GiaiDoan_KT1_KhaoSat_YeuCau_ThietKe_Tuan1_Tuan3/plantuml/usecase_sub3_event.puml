@@ -1,0 +1,27 @@
+@startuml usecase_sub3_event
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+
+left to right direction
+actor "Trưởng ban / BCN" as Leader
+actor "Thành viên (Member)" as Member
+
+rectangle "Phân hệ 3: Quản lý Sự kiện & Điểm danh QR" {
+    usecase "UC04: Quản lý Sự kiện / Hoạt động" as UC04
+    usecase "Tạo mới / Chỉnh sửa Sự kiện" as UC04_Create
+    usecase "Tự động sinh mã QR Code độc bản" as UC04_QR
+    usecase "UC09: Quét mã QR Điểm danh qua Mobile" as UC09
+    usecase "Xác thực Tính hợp lệ mã QR" as UC09_Verify
+    usecase "Kiểm tra chống điểm danh trùng" as UC09_Unique
+}
+
+Leader --> UC04
+UC04 ..> UC04_Create : <<include>>
+UC04 ..> UC04_QR : <<include>>
+
+Member --> UC09
+UC09 ..> UC09_Verify : <<include>>
+UC09 ..> UC09_Unique : <<include>>
+@enduml

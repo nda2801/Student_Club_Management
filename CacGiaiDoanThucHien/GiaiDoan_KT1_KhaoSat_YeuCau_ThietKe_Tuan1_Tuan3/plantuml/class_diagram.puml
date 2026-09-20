@@ -1,0 +1,162 @@
+@startuml class_diagram
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam class {
+    BackgroundColor #F8FAFC
+    BorderColor #3B82F6
+    HeaderBackgroundColor #DBEAFE
+    FontColor #0F172A
+    AttributeFontColor #334155
+    MethodFontColor #1E293B
+    ArrowColor #2563EB
+}
+
+title **BIỂU ĐỒ LỚP PHÂN TÍCH & THỰC THỂ (UML CLASS DIAGRAM / DOMAIN MODEL)\nHỆ THỐNG QUẢN LÝ CÂU LẠC BỘ SINH VIÊN TÍCH HỢP AI**
+
+enum RoleEnum {
+    ADMIN
+    LEADER
+    MEMBER
+}
+
+enum ActivityStatus {
+    DRAFT
+    PUBLISHED
+    CHECKIN_ACTIVE
+    COMPLETED
+    CANCELLED
+}
+
+enum TaskStatus {
+    TO_DO
+    IN_PROGRESS
+    DONE
+    ARCHIVED
+}
+
+class User {
+    +int id
+    +string email
+    +string password_hash
+    +string full_name
+    +RoleEnum role
+    +int department_id
+    +List<string> skills
+    +List<string> free_slots
+    +int contribution_score
+    +datetime created_at
+    --
+    +authenticate(password: string): bool
+    +update_profile(skills: List, slots: List): void
+    +calculate_contribution_score(): int
+}
+
+class Department {
+    +int id
+    +string name
+    +string description
+    +int leader_id
+    --
+    +get_members(): List<User>
+    +add_member(user_id: int): void
+    +get_active_tasks(): List<Task>
+}
+
+class Activity {
+    +int id
+    +string title
+    +string description
+    +string location
+    +datetime start_time
+    +datetime end_time
+    +string qr_code_token
+    +ActivityStatus status
+    +int created_by
+    --
+    +generate_qr_code(): string
+    +get_attendance_rate(): float
+    +close_activity(): void
+}
+
+class Attendance {
+    +int id
+    +int activity_id
+    +int user_id
+    +datetime checkin_time
+    +string method
+    --
+    +verify_qr(token: string): bool
+    +record_checkin(): void
+}
+
+class Task {
+    +int id
+    +int activity_id
+    +int department_id
+    +string title
+    +string description
+    +List<string> required_skills
+    +datetime deadline
+    +TaskStatus status
+    +int created_by
+    +int assignee_id
+    --
+    +assign_member(user_id: int): void
+    +update_status(new_status: TaskStatus): void
+    +is_overdue(): bool
+}
+
+class TaskAssignment {
+    +int id
+    +int task_id
+    +int user_id
+    +float match_score
+    +bool is_ai_suggested
+    +string suggestion_reason
+    +datetime assigned_at
+    --
+    +confirm_assignment(): void
+}
+
+class AILog {
+    +int id
+    +string feature_type
+    +string prompt_text
+    +dict response_payload
+    +string engine_used
+    +int execution_time_ms
+    +datetime created_at
+    --
+    +log_interaction(): void
+}
+
+class AIService {
+    +string api_key
+    +string model_name
+    +RuleBasedFallbackEngine fallback_engine
+    --
+    +suggest_assignments(tasks: List, members: List): List<AssignmentSuggestion>
+    +generate_announcement(event_data: dict, tone: string): string
+    +summarize_activity(notes: string, feedbacks: List): dict
+}
+
+' Relationships
+Department "1" o-- "0..*" User : "has members"
+Department "1" *-- "0..*" Task : "manages"
+User "1" -- "0..*" Attendance : "checks in"
+Activity "1" *-- "0..*" Attendance : "tracks"
+Activity "1" *-- "0..*" Task : "contains"
+Task "1" -- "0..1" TaskAssignment : "has assignment"
+User "1" -- "0..*" TaskAssignment : "is assigned to"
+User "1" -- "0..*" Activity : "creates"
+User "1" -- "0..*" Task : "creates/owns"
+
+AIService ..> AILog : "<<creates>> log"
+AIService ..> TaskAssignment : "<<generates>> suggestion"
+
+@enduml

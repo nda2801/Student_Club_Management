@@ -1,0 +1,35 @@
+@startuml ai_functional_flow
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+
+left to right direction
+
+package "Dữ liệu Đầu vào (Raw Context)" as InputPkg #EFF6FF {
+    rectangle "Thông tin thô sự kiện" as In1
+    rectangle "Ghi chú họp & Phản hồi" as In2
+    rectangle "Task List + Skill Matrix + Free Slots" as In3
+}
+
+package "Engine Xử lý AI (Dual-Engine Architecture)" as AIPkg #FEF3C7 {
+    rectangle "FR-AI-01: AI Sinh Thông báo" as AI1
+    rectangle "FR-AI-02: AI Tóm tắt Kết quả" as AI2
+    rectangle "FR-AI-03: AI Gợi ý Phân công" as AI3
+}
+
+package "Kết quả Đầu ra Chuẩn hóa (Pydantic Output)" as OutputPkg #DCFCE7 {
+    rectangle "Bài viết truyền thông sinh động + Emoji" as Out1
+    rectangle "Báo cáo 3 phần: Ưu điểm, Tồn tại, Đề xuất" as Out2
+    rectangle "Bảng Matchmaking % & Lý do đề xuất" as Out3
+}
+
+In1 --> AI1
+AI1 --> Out1
+
+In2 --> AI2
+AI2 --> Out2
+
+In3 --> AI3
+AI3 --> Out3
+@enduml

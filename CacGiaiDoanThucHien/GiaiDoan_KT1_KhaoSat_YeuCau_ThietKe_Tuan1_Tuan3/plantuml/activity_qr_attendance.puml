@@ -1,0 +1,68 @@
+@startuml activity_qr_attendance
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+
+skinparam activity {
+    BackgroundColor #EFF6FF
+    BorderColor #3B82F6
+    FontColor #0F172A
+    DiamondBackgroundColor #FEF3C7
+    DiamondBorderColor #F59E0B
+    ArrowColor #2563EB
+}
+
+title **BIỂU ĐỒ HOẠT ĐỘNG: TỔ CHỨC SỰ KIỆN & ĐIỂM DANH QR TỰ ĐỘNG (UML ACTIVITY DIAGRAM)**
+
+|Trưởng ban / BCN|
+start
+:Nhập thông tin sự kiện trên Web Dashboard;
+:Nhấn 'Lưu Sự kiện';
+
+|Flask Backend & PostgreSQL|
+:Lưu sự kiện vào CSDL PostgreSQL;
+:Tự động sinh chuỗi mã QR Code độc bản (UUID);
+
+|Trưởng ban / BCN|
+:Trình chiếu mã QR Code trên màn hình sự kiện;
+
+|Thành viên CLB (Mobile)|
+:Mở Camera / Web Scanner quét mã QR;
+:Gửi yêu cầu điểm danh POST /api/attendance/checkin;
+
+|Flask Backend & PostgreSQL|
+if (JWT Token hợp lệ?) then (Có)
+    if (Mã QR khớp và Sự kiện đang diễn ra?) then (Có)
+        if (Đã điểm danh sự kiện này chưa?) then (Chưa)
+            :Ghi bản ghi vào bảng attendances;
+            :Cộng 10 điểm Contribution Score cho thành viên;
+            :Trả về HTTP 200 OK;
+            
+            |Thành viên CLB (Mobile)|
+            :Hiển thị Checkmark xanh & Thông báo +10 điểm;
+        else (Đã điểm danh rồi)
+            |Flask Backend & PostgreSQL|
+            :Trả về HTTP 409 Conflict;
+            
+            |Thành viên CLB (Mobile)|
+            :Hiển thị Toast cảnh báo đã điểm danh;
+        endif
+    else (Không khớp / Đã đóng)
+        |Flask Backend & PostgreSQL|
+        :Trả về HTTP 400 Bad Request;
+        
+        |Thành viên CLB (Mobile)|
+        :Hiển thị Toast lỗi mã QR không hợp lệ;
+    endif
+else (Không hợp lệ)
+    |Flask Backend & PostgreSQL|
+    :Trả về HTTP 401 Unauthorized;
+    
+    |Thành viên CLB (Mobile)|
+    :Yêu cầu đăng nhập lại;
+endif
+
+stop
+@enduml

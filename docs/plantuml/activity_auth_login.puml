@@ -1,0 +1,83 @@
+@startuml activity_auth_login
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 14
+skinparam defaultTextAlignment center
+skinparam dpi 200
+
+skinparam title {
+    FontSize 18
+    FontStyle bold
+    FontColor #0F172A
+}
+
+skinparam arrow {
+    Color #2563EB
+    FontColor #1E40AF
+    FontSize 13
+    FontStyle bold
+}
+
+skinparam activity {
+    BackgroundColor #EFF6FF
+    BorderColor #3B82F6
+    BorderThickness 1.5
+    FontColor #0F172A
+    FontSize 14
+    DiamondBackgroundColor #FEF3C7
+    DiamondBorderColor #D97706
+    DiamondFontColor #92400E
+    DiamondFontSize 13
+    DiamondFontStyle bold
+}
+
+skinparam swimlane {
+    TitleFontSize 15
+    TitleFontStyle bold
+    BorderColor #94A3B8
+    BorderThickness 1.5
+}
+
+title BIỂU ĐỒ HOẠT ĐỘNG: ĐĂNG NHẬP, XÁC THỰC BCRYPT & CẤP TOKEN JWT
+
+|Người dùng (Client)|
+start
+:Nhập **Email & Mật khẩu** trên React UI;
+:Gửi yêu cầu **POST /api/auth/login**;
+
+|Flask Backend & PostgreSQL|
+:Tiếp nhận yêu cầu xác thực;
+:Truy vấn tìm tài khoản theo Email;
+
+if (Email tồn tại?) then (Không)
+    :Trả về mã lỗi **HTTP 401**:\nEmail không tồn tại;
+else (Có)
+    :Kiểm tra mật khẩu bằng **bcrypt.checkpw()**;
+    if (Mật khẩu khớp?) then (Sai)
+        :Trả về mã lỗi **HTTP 401**:\nMật khẩu không chính xác;
+    else (Đúng)
+        :Khởi tạo **JWT Token**\n(user_id, role, exp=7 ngày);
+        :Trả về **HTTP 200 OK**\nkèm JWT Token & User Profile;
+    endif
+endif
+
+|Người dùng (Client)|
+if (Kết quả xác thực?) then (Thành công (200 OK))
+    :Lưu JWT vào **localStorage** & **AuthContext**;
+    switch (Vai trò tài khoản?)
+    case (ADMIN)
+        :Chuyển hướng đến\n**Admin Dashboard**;
+    case (LEADER)
+        :Chuyển hướng đến\n**Leader Dashboard**;
+    case (MEMBER)
+        :Chuyển hướng đến\n**Member Portal**;
+    endswitch
+else (Thất bại (401 Error))
+    :Hiển thị thông báo lỗi qua **Toast Notification**;
+endif
+
+stop
+@enduml

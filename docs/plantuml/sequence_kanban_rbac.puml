@@ -1,0 +1,64 @@
+@startuml sequence_kanban_rbac
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+
+skinparam sequence {
+    ArrowColor #2563EB
+    ActorBorderColor #1D4ED8
+    LifeLineBorderColor #3B82F6
+    LifeLineBackgroundColor #DBEAFE
+    ParticipantBorderColor #3B82F6
+    ParticipantBackgroundColor #EFF6FF
+    ParticipantFontColor #0F172A
+}
+
+title **BIỂU ĐỒ TUẦN TỰ: CẬP NHẬT TRẠNG THÁI TASK KANBAN VỚI KIỂM SOÁT RBAC (UC05 & UC10)**
+
+autonumber
+actor "Người dùng (Member / Leader)" as User
+participant "React Kanban UI\n(Vite Component)" as UI
+participant "Flask Task Controller\n(Backend REST API)" as Controller
+participant "PostgreSQL DB\n(Docker Database)" as DB
+
+User -> UI : Kéo thả thẻ Task sang cột [DONE]
+UI -> Controller : PATCH /api/tasks/:id/status {status: "DONE"}\n(Headers: Bearer JWT Token)
+
+activate Controller
+Controller -> Controller : Xác thực JWT & lấy current_user (id, role)
+
+Controller -> DB : SELECT * FROM tasks WHERE id = :id
+activate DB
+DB --> Controller : Trả về Task Entity (created_by, assignee_id, status)
+deactivate DB
+
+alt Vai trò là ADMIN hoặc LEADER
+    Controller -> DB : UPDATE tasks SET status = 'DONE', updated_at = NOW() WHERE id = :id
+    activate DB
+    Controller -> DB : UPDATE users SET contribution_score = contribution_score + 20 WHERE id = :assignee_id
+    DB --> Controller : Commit OK
+    deactivate DB
+    
+    Controller --> UI : HTTP 200 OK {"message": "Cập nhật thành công"}
+    UI --> User : Cố định thẻ Task tại cột DONE + Toast thông báo xanh
+else Vai trò là MEMBER
+    alt current_user.id == task.assignee_id (Chính chủ nhiệm vụ)
+        Controller -> DB : UPDATE tasks SET status = 'DONE', updated_at = NOW() WHERE id = :id
+        activate DB
+        Controller -> DB : UPDATE users SET contribution_score = contribution_score + 20 WHERE id = :assignee_id
+        DB --> Controller : Commit OK
+        deactivate DB
+        
+        Controller --> UI : HTTP 200 OK {"message": "Cập nhật thành công"}
+        UI --> User : Cố định thẻ Task tại cột DONE + Toast thông báo xanh
+    else current_user.id != task.assignee_id (Không phải người được giao việc)
+        Controller --> UI : HTTP 403 Forbidden\n{"message": "Bạn không có quyền sửa nhiệm vụ của thành viên khác"}
+        UI -> UI : Rollback thẻ Task về vị trí cột ban đầu
+        UI --> User : Toast cảnh báo đỏ "RBAC Access Denied"
+    end
+end
+deactivate Controller
+
+@enduml

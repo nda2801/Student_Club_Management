@@ -1,0 +1,45 @@
+@startuml state_activity_lifecycle
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+
+[*] --> DRAFT : Khởi tạo bản nháp sự kiện
+
+state DRAFT {
+    description: Nhập tên, địa điểm, thời gian
+}
+
+state PUBLISHED {
+    description: Ban hành kế hoạch & Tự động tạo mã QR UUID
+}
+
+state CHECKIN_ACTIVE {
+    description: Mở cổng quét QR điểm danh
+}
+
+state CHECKIN_CLOSED {
+    description: Đóng cổng điểm danh
+}
+
+state COMPLETED {
+    description: Sự kiện kết thúc
+}
+
+state REPORTED {
+    description: AI tổng kết & Xuất báo cáo
+}
+
+state CANCELLED {
+    description: Hủy sự kiện
+}
+
+DRAFT --> PUBLISHED : Duyệt ban hành
+PUBLISHED --> CHECKIN_ACTIVE : Bắt đầu sự kiện
+CHECKIN_ACTIVE --> CHECKIN_CLOSED : Hết giờ điểm danh
+CHECKIN_CLOSED --> COMPLETED : Bế mạc sự kiện
+COMPLETED --> REPORTED : AI tóm tắt phản hồi
+PUBLISHED --> CANCELLED : Hủy sự kiện
+REPORTED --> [*]
+CANCELLED --> [*]
+@enduml

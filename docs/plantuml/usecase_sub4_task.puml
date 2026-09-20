@@ -1,0 +1,27 @@
+@startuml usecase_sub4_task
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+
+left to right direction
+actor "Trưởng ban / Admin" as Leader
+actor "Thành viên (Member)" as Member
+
+rectangle "Phân hệ 4: Quản lý Nhiệm vụ & Kanban Board" {
+    usecase "UC05: Quản lý Nhiệm vụ Kanban" as UC05
+    usecase "Tạo Task & Đặt Deadline / Kỹ năng" as UC05_Create
+    usecase "Phân công Người thực hiện" as UC05_Assign
+    usecase "Kéo thả chuyển trạng thái 3 cột" as UC05_Move
+    usecase "UC10: Cập nhật Tiến độ Task cá nhân" as UC10
+    usecase "RBAC Guard: Chỉ sửa Task chính chủ" as UC10_RBAC
+}
+
+Leader --> UC05
+UC05 ..> UC05_Create : <<include>>
+UC05 ..> UC05_Assign : <<include>>
+UC05 ..> UC05_Move : <<include>>
+
+Member --> UC10
+UC10 ..> UC10_RBAC : <<include>>
+@enduml

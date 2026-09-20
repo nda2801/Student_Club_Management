@@ -1,0 +1,27 @@
+@startuml usecase_sub2_member
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+
+left to right direction
+actor "Thành viên (Member)" as Member
+actor "Ban Chủ nhiệm (Admin)" as Admin
+
+rectangle "Phân hệ 2: Quản lý Thành viên & Ban Chuyên môn" {
+    usecase "UC02: Cập nhật Hồ sơ cá nhân" as UC02
+    usecase "Khai báo Ma trận Kỹ năng (Skill Matrix)" as UC02_Skill
+    usecase "Thiết lập Lịch rảnh (Free Slots)" as UC02_Slot
+    usecase "UC11: Quản lý Cơ cấu Ban Chuyên môn" as UC11
+    usecase "Tạo / Sửa / Xóa Ban Chuyên môn" as UC11_Dept
+    usecase "Điều chuyển Thành viên & Bổ nhiệm Leader" as UC11_Assign
+}
+
+Member --> UC02
+UC02 ..> UC02_Skill : <<include>>
+UC02 ..> UC02_Slot : <<include>>
+
+Admin --> UC11
+UC11 ..> UC11_Dept : <<include>>
+UC11 ..> UC11_Assign : <<include>>
+@enduml

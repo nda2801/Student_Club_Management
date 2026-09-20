@@ -1,0 +1,134 @@
+@startuml erd_database
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam linetype ortho
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam entity {
+    BackgroundColor #F8FAFC
+    BorderColor #2563EB
+    HeaderBackgroundColor #DBEAFE
+    FontColor #0F172A
+    BorderThickness 1.5
+}
+
+title **SƠ ĐỒ THỰC THỂ - QUAN HỆ CƠ SỞ DỮ LIỆU (DATABASE ERD - CROW'S FOOT NOTATION)\nHỆ THỐNG QUẢN LÝ CÂU LẠC BỘ SINH VIÊN TÍCH HỢP AI (POSTGRESQL / SQLITE)**
+
+entity "departments" as departments {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * name : VARCHAR(100) <<UNIQUE, NOT NULL>>
+    description : TEXT <<Nullable>>
+}
+
+entity "users" as users {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * full_name : VARCHAR(150) <<NOT NULL>>
+    * email : VARCHAR(150) <<UNIQUE, INDEX, NOT NULL>>
+    * password_hash : VARCHAR(255) <<NOT NULL, Bcrypt>>
+    * role : VARCHAR(20) <<CHECK: ADMIN/LEADER/MEMBER, Default: MEMBER>>
+    department_id : INTEGER <<FK, Nullable, ON DELETE SET NULL>>
+    skills : TEXT <<JSON Array, Default: '[]'>>
+    free_slots : TEXT <<JSON Array, Default: '[]'>>
+    avatar_url : VARCHAR(255) <<Nullable>>
+    * created_at : TIMESTAMP <<Default: CURRENT_TIMESTAMP>>
+}
+
+entity "activities" as activities {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * title : VARCHAR(200) <<NOT NULL>>
+    description : TEXT <<Nullable>>
+    * start_time : TIMESTAMP <<NOT NULL>>
+    end_time : TIMESTAMP <<Nullable>>
+    location : VARCHAR(200) <<Nullable>>
+    latitude : FLOAT <<Default: 21.028511>>
+    longitude : FLOAT <<Default: 105.804817>>
+    radius_meters : FLOAT <<Default: 100.0>>
+    * status : VARCHAR(20) <<CHECK: UPCOMING/ONGOING/COMPLETED, Default: UPCOMING>>
+    qr_code_hash : VARCHAR(100) <<Nullable, Dynamic UUID>>
+    created_by : INTEGER <<FK, Nullable, ON DELETE SET NULL>>
+    * created_at : TIMESTAMP <<Default: CURRENT_TIMESTAMP>>
+}
+
+entity "attendances" as attendances {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * activity_id : INTEGER <<FK, NOT NULL, ON DELETE CASCADE>>
+    * user_id : INTEGER <<FK, NOT NULL, ON DELETE CASCADE>>
+    * checkin_time : TIMESTAMP <<Default: CURRENT_TIMESTAMP>>
+    * status : VARCHAR(20) <<CHECK: PRESENT/LATE/ABSENT, Default: PRESENT>>
+    device_fingerprint : VARCHAR(255) <<Nullable>>
+    --
+    **UNIQUE(activity_id, user_id)**
+}
+
+entity "tasks" as tasks {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * activity_id : INTEGER <<FK, NOT NULL, ON DELETE CASCADE>>
+    * title : VARCHAR(200) <<NOT NULL>>
+    description : TEXT <<Nullable>>
+    required_skill : VARCHAR(100) <<Nullable>>
+    deadline : TIMESTAMP <<Nullable>>
+    * status : VARCHAR(20) <<CHECK: TO_DO/IN_PROGRESS/DONE, Default: TO_DO>>
+}
+
+entity "task_assignments" as task_assignments {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * task_id : INTEGER <<FK, NOT NULL, ON DELETE CASCADE>>
+    * user_id : INTEGER <<FK, NOT NULL, ON DELETE CASCADE>>
+    ai_suggested : BOOLEAN <<Default: FALSE>>
+    match_score : FLOAT <<Default: 1.0, Range: 0.0 - 1.0>>
+    assigned_by : INTEGER <<FK, Nullable, ON DELETE SET NULL>>
+    * assigned_at : TIMESTAMP <<Default: CURRENT_TIMESTAMP>>
+    --
+    **UNIQUE(task_id, user_id)**
+}
+
+entity "ai_logs" as ai_logs {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    user_id : INTEGER <<FK, Nullable, ON DELETE SET NULL>>
+    * prompt_type : VARCHAR(50) <<CHECK: ANNOUNCEMENT/SUMMARY/RECOMMEND, NOT NULL>>
+    * input_data : TEXT <<NOT NULL>>
+    * output_result : TEXT <<NOT NULL>>
+    * created_at : TIMESTAMP <<Default: CURRENT_TIMESTAMP>>
+}
+
+' ================= RELATIONS =================
+departments ||--o{ users : "1. chứa nhiều thành viên (1:N)\n[FK: department_id]"
+users ||--o{ activities : "2. khởi tạo sự kiện (1:N)\n[FK: created_by]"
+
+activities ||--o{ attendances : "3. ghi nhận lượt tham gia (1:N)\n[FK: activity_id]"
+users ||--o{ attendances : "4. thực hiện điểm danh (1:N)\n[FK: user_id]"
+
+activities ||--o{ tasks : "5. phân rã thành nhiệm vụ (1:N)\n[FK: activity_id]"
+tasks ||--o{ task_assignments : "6. phân công nhiệm vụ (1:N)\n[FK: task_id]"
+users ||--o{ task_assignments : "7. được phân công (1:N)\n[FK: user_id]"
+users ||--o{ task_assignments : "8. người phê duyệt phân công (0..1:N)\n[FK: assigned_by]"
+
+users ||--o{ ai_logs : "9. ghi vết lịch sử AI prompt (0..1:N)\n[FK: user_id]"
+
+note right of attendances
+  <b>RÀNG BUỘC TOÀN VẸN CSDL</b>
+  * <b>UNIQUE(activity_id, user_id)</b>:
+    Một thành viên chỉ điểm danh 1 lần duy nhất trong sự kiện.
+  * <b>device_fingerprint & Geofencing</b>:
+    Chống gian lận điểm danh hộ từ xa hoặc trùng thiết bị.
+end note
+
+note right of task_assignments
+  <b>CƠ CHẾ AI SMART MATCHMAKING</b>
+  * <b>ai_suggested</b>: Cờ đánh dấu nhiệm vụ do AI đề xuất.
+  * <b>match_score</b>: Độ tương thích kỹ năng (0.0 -> 1.0)
+    giữa <i>tasks.required_skill</i> và <i>users.skills</i>.
+  * <b>assigned_by</b>: Leader/Admin phê duyệt sau cùng.
+end note
+
+@enduml

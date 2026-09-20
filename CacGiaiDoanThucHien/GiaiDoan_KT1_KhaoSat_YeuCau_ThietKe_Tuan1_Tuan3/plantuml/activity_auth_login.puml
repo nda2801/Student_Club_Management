@@ -1,0 +1,41 @@
+@startuml activity_auth_login
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+
+|Người dùng (Client)|
+start
+:Nhập Email & Mật khẩu trên React UI;
+:Gửi POST /api/auth/login;
+
+|Flask Backend & PostgreSQL|
+if (Email có tồn tại trong CSDL?) then (Có)
+    if (bcrypt.checkpw(password, hash) đúng?) then (Đúng)
+        :Tạo JWT Token (Payload: user_id, role, exp=7 ngày);
+        :Trả về HTTP 200 OK kèm JWT Token;
+        
+        |Người dùng (Client)|
+        :Lưu Token vào localStorage & AuthContext;
+        if (Vai trò là gì?) then (ADMIN)
+            :Chuyển hướng đến Admin Dashboard;
+        elseif (LEADER) then
+            :Chuyển hướng đến Leader Dashboard;
+        else (MEMBER)
+            :Chuyển hướng đến Member Portal;
+        endif
+    else (Sai)
+        |Flask Backend & PostgreSQL|
+        :Trả về HTTP 401: Mật khẩu không chính xác;
+        |Người dùng (Client)|
+        :Hiển thị Toast cảnh báo lỗi;
+    endif
+else (Không)
+    |Flask Backend & PostgreSQL|
+    :Trả về HTTP 401: Email không tồn tại;
+    |Người dùng (Client)|
+    :Hiển thị Toast cảnh báo lỗi;
+endif
+
+stop
+@enduml

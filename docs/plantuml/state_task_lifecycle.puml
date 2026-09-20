@@ -1,0 +1,53 @@
+@startuml state_task_lifecycle
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+
+skinparam state {
+    BackgroundColor #EFF6FF
+    BorderColor #3B82F6
+    FontColor #0F172A
+    ArrowColor #2563EB
+}
+
+title **BIỂU ĐỒ MÁY TRẠNG THÁI: VÒNG ĐỜI NHIỆM VỤ (UML STATE MACHINE DIAGRAM)**
+
+[*] --> TO_DO : Leader tạo Task & gán người làm
+
+state TO_DO {
+    description: Nhiệm vụ đang chờ thực hiện
+}
+
+state IN_PROGRESS {
+    description: Thành viên đang tiến hành công việc
+}
+
+state DONE {
+    description: Nhiệm vụ đã hoàn thành (+20 Điểm)
+}
+
+state ARCHIVED {
+    description: Đã nghiệm thu & Lưu trữ lịch sử
+}
+
+state CANCELLED {
+    description: Hủy bỏ nhiệm vụ
+}
+
+TO_DO --> IN_PROGRESS : Thành viên kéo sang In-Progress / Bắt đầu làm
+IN_PROGRESS --> TO_DO : Tạm hoãn / Chuyển giao lại
+
+IN_PROGRESS --> DONE : Thành viên hoàn tất & kéo sang Done
+DONE --> IN_PROGRESS : Leader yêu cầu chỉnh sửa lại (Reopen)
+
+TO_DO --> CANCELLED : Sự kiện hủy hoặc xóa task
+IN_PROGRESS --> CANCELLED : Hủy ngang trong quá trình làm
+
+DONE --> ARCHIVED : Đóng sự kiện / Tổng kết cuối kỳ
+CANCELLED --> ARCHIVED : Lưu vết kiểm toán
+
+ARCHIVED --> [*]
+
+@enduml

@@ -1,0 +1,65 @@
+@startuml sequence_qr_checkin
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+
+skinparam sequence {
+    ArrowColor #2563EB
+    ActorBorderColor #1D4ED8
+    LifeLineBorderColor #3B82F6
+    LifeLineBackgroundColor #DBEAFE
+    ParticipantBorderColor #3B82F6
+    ParticipantBackgroundColor #EFF6FF
+    ParticipantFontColor #0F172A
+}
+
+title **BIỂU ĐỒ TUẦN TỰ: QUÉT MÃ QR ĐIỂM DANH SỰ KIỆN REALTIME (UC09)**
+
+autonumber
+actor "Thành viên (Member)\nMobile Browser" as Member
+participant "React Frontend\n(Vite Check-in UI)" as UI
+participant "Flask Attendance API\n(Controller)" as Controller
+participant "PostgreSQL DB\n(Docker Container)" as DB
+actor "Trưởng ban (Leader)\nWeb Dashboard" as Leader
+
+Member -> UI : Mở Camera / Web Scanner quét mã QR
+UI -> Controller : POST /api/attendance/checkin\n(Header: Bearer JWT, Body: {qr_token})
+
+activate Controller
+Controller -> Controller : Xác thực JWT (@jwt_required)
+
+Controller -> DB : SELECT * FROM activities WHERE qr_code_token = :qr_token
+activate DB
+DB --> Controller : Trả về Activity record (status, time range)
+deactivate DB
+
+alt Mã QR không khớp hoặc sự kiện đã đóng
+    Controller --> UI : HTTP 400 Bad Request\n{"message": "Mã QR không hợp lệ hoặc sự kiện đã đóng"}
+    UI --> Member : Hiển thị Toast thông báo lỗi đỏ
+else Sự kiện đang diễn ra hợp lệ
+    Controller -> DB : SELECT * FROM attendances\nWHERE activity_id = :act_id AND user_id = :uid
+    activate DB
+    DB --> Controller : Kiểm tra bản ghi điểm danh
+    deactivate DB
+    
+    alt Đã điểm danh trước đó
+        Controller --> UI : HTTP 409 Conflict\n{"message": "Bạn đã điểm danh sự kiện này rồi"}
+        UI --> Member : Hiển thị cảnh báo điểm danh trùng lặp
+    else Chưa điểm danh
+        Controller -> DB : INSERT INTO attendances\n(activity_id, user_id, checkin_time, method)
+        activate DB
+        Controller -> DB : UPDATE users SET contribution_score = contribution_score + 10\nWHERE id = :uid
+        DB --> Controller : Commit Transaction thành công
+        deactivate DB
+        
+        Controller --> UI : HTTP 200 OK\n{"message": "Điểm danh thành công", "points_earned": 10}
+        UI --> Member : Hiệu ứng Checkmark xanh & Thông báo +10 điểm
+        
+        Controller -->> Leader : WebSocket / Polling Refresh Leaderboard
+    end
+end
+deactivate Controller
+
+@enduml
