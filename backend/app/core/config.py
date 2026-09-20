@@ -1,6 +1,18 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
+# 1. Tự động tìm và đọc file .env tổng ở thư mục gốc (Root Single Source of Truth)
+_root_env = Path(__file__).resolve().parents[3] / ".env"
+if _root_env.exists():
+    load_dotenv(_root_env)
+
+# 2. Đọc file backend/.env nếu người dùng muốn ghi đè riêng cho backend
+_backend_env = Path(__file__).resolve().parents[2] / ".env"
+if _backend_env.exists():
+    load_dotenv(_backend_env, override=True)
+
+# 3. Fallback đọc mặc định theo thư mục làm việc hiện hành
 load_dotenv()
 
 class Settings:
