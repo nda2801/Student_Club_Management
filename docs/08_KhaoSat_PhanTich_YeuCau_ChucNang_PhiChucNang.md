@@ -42,7 +42,7 @@
      - 4.3.2 Phân hệ 2: Quản lý Hồ sơ Thành viên & Ban Chuyên môn (Kèm Code Mermaid & PlantUML)
      - 4.3.3 Phân hệ 3: Quản lý Sự kiện & Điểm danh QR Độc bản (Kèm Code Mermaid & PlantUML)
      - 4.3.4 Phân hệ 4: Quản lý Nhiệm vụ & Bảng Kanban (Kèm Code Mermaid & PlantUML)
-     - 4.3.5 Phân hệ 5: Trợ lý Trí tuệ Nhân tạo & Báo cáo Thống kê (Kèm Code Mermaid & PlantUML)
+     - 4.3.5 Phân hệ 5: Báo cáo Thống kê (Kèm Code Mermaid & PlantUML)
    - 4.4 Bảng Đặc tả Ca Sử dụng Mẫu Chi tiết (Use Case Specifications: UC04, UC05/UC10, UC06)
    - 4.5 Ma trận Phân loại Mức độ Ưu tiên theo Phương pháp MoSCoW
 5. [CHƯƠNG 5: MÔ HÌNH HÓA VÀ THIẾT KẾ HỆ THỐNG BẰNG CÁC BIỂU ĐỒ UML (UML MODELING & SYSTEM DESIGN - TUẦN 3)](#chương-5-mô-hình-hóa-và-thiết-kế-hệ-thống-bằng-các-biểu-đồ-uml-uml-modeling--system-design---tuần-3)
@@ -294,12 +294,12 @@ ightarrow$ Pydantic Schema). | Tuân thủ nguyên lý Clean Architecture & Sepa
 | :---: | :---: | :--- | :--- | :--- | :--- |
 | **01** | `UC01` | Đăng nhập & Xác thực JWT | Quản trị Hệ thống & Phân quyền | Người dùng (All Users) | Database Subsystem |
 | **02** | `UC02` | Cập nhật Hồ sơ, Skill Matrix & Lịch rảnh | Quản lý Thành viên & Ban | Thành viên, Admin | Database Subsystem |
-| **03** | `UC03` | Tra cứu Lịch sử Hoạt động & Leaderboard | Trợ lý AI & Báo cáo Thống kê | Người dùng (All Users) | Database Subsystem |
+| **03** | `UC03` | Tra cứu Lịch sử Hoạt động & Leaderboard | Báo cáo Thống kê Thống kê | Người dùng (All Users) | Database Subsystem |
 | **04** | `UC04` | Quản lý Sự kiện & Sinh mã QR Độc bản | Sự kiện & Điểm danh QR | Trưởng ban, Admin | Database Subsystem |
 | **05** | `UC05` | Quản lý Nhiệm vụ & Kanban Board | Quản lý Nhiệm vụ & Kanban | Trưởng ban, Admin | Database Subsystem |
-| **06** | `UC06` | AI Gợi ý Phân công Nhiệm vụ Thông minh | Trợ lý AI & Báo cáo Thống kê | Trưởng ban, Admin | Cloud LLM / Fallback Engine |
-| **07** | `UC07` | AI Sinh Bài đăng Thông báo Sự kiện | Trợ lý AI & Báo cáo Thống kê | Trưởng ban, Admin | Cloud LLM / Fallback Engine |
-| **08** | `UC08` | AI Tóm tắt Kết quả Hoạt động & Phản hồi | Trợ lý AI & Báo cáo Thống kê | Trưởng ban, Admin | Cloud LLM / Fallback Engine |
+| **06** | `UC06` | AI Gợi ý Phân công Nhiệm vụ Thông minh | Báo cáo Thống kê Thống kê | Trưởng ban, Admin | Cloud LLM / Fallback Engine |
+| **07** | `UC07` | AI Sinh Bài đăng Thông báo Sự kiện | Báo cáo Thống kê Thống kê | Trưởng ban, Admin | Cloud LLM / Fallback Engine |
+| **08** | `UC08` | AI Tóm tắt Kết quả Hoạt động & Phản hồi | Báo cáo Thống kê Thống kê | Trưởng ban, Admin | Cloud LLM / Fallback Engine |
 | **09** | `UC09` | Quét mã QR Điểm danh Sự kiện | Sự kiện & Điểm danh QR | Thành viên | Database Subsystem |
 | **10** | `UC10` | Cập nhật Tiến độ Task của bản thân | Quản lý Nhiệm vụ & Kanban | Thành viên | Database Subsystem |
 | **11** | `UC11` | Quản lý Cơ cấu Ban Chuyên môn | Quản lý Thành viên & Ban | Ban Chủ nhiệm (Admin) | Database Subsystem |
@@ -323,7 +323,7 @@ flowchart TD
     subgraph Sub1["[Package 1] Phân hệ Xác thực & Phân quyền (Auth & RBAC)"]
         UC01(["UC01: Đăng nhập & Xác thực JWT"])
         UC12(["UC12: Quản lý & Phân quyền Tài khoản"])
-        UC_V(["<<include>> Xác thực JWT Token & Phân quyền"])
+        UC_V(["<<extend>> Xác thực JWT Token & Phân quyền"])
     end
 
     subgraph Sub2["[Package 2] Phân hệ Quản lý Thành viên & Ban Chuyên môn"]
@@ -334,16 +334,16 @@ flowchart TD
     subgraph Sub3["[Package 3] Phân hệ Quản lý Sự kiện & Điểm danh QR"]
         UC04(["UC04: Quản lý Sự kiện & Sinh mã QR"])
         UC09(["UC09: Quét mã QR Điểm danh"])
-        UC_QR(["<<include>> Sinh chuỗi định danh QR độc bản"])
+        UC_QR(["<<extend>> Sinh chuỗi định danh QR độc bản"])
     end
 
     subgraph Sub4["[Package 4] Phân hệ Quản lý Nhiệm vụ & Kanban Board"]
         UC05(["UC05: Quản lý Nhiệm vụ & Kanban Board"])
         UC10(["UC10: Cập nhật Tiến độ Task của mình"])
-        UC_RBAC(["<<include>> Kiểm tra quyền sở hữu Task"])
+        UC_RBAC(["<<extend>> Kiểm tra quyền sở hữu Task"])
     end
 
-    subgraph Sub5["[Package 5] Phân hệ Trợ lý AI & Báo cáo Thống kê"]
+    subgraph Sub5["[Package 5] Phân hệ Báo cáo Thống kê Thống kê"]
         UC06(["UC06: AI Gợi ý Phân công Nhiệm vụ"])
         UC07(["UC07: AI Sinh Bài đăng Thông báo"])
         UC08(["UC08: AI Tóm tắt Kết quả Hoạt động"])
@@ -370,9 +370,9 @@ flowchart TD
     AIService --- UC07
     AIService --- UC08
 
-    UC04 -.->|<<include>>| UC_QR
-    UC09 -.->|<<include>>| UC_V
-    UC10 -.->|<<include>>| UC_RBAC
+    UC04 -.->|<<extend>>| UC_QR
+    UC09 -.->|<<extend>>| UC_V
+    UC10 -.->|<<extend>>| UC_RBAC
     UC05 -.->|<<extend>>| UC06
     UC04 -.->|<<extend>>| UC07
 ```
@@ -436,7 +436,7 @@ rectangle "Hệ Thống Quản Lý Câu Lạc Bộ Sinh Viên Tích Hợp AI" {
     package "Phân hệ 1: Xác thực & Phân quyền (Auth & RBAC)" {
         usecase "UC01: Đăng nhập & Xác thực JWT" as UC01
         usecase "UC12: Quản trị & Phân quyền Tài khoản" as UC12
-        usecase "Xác thực JWT & Kiểm tra Phân quyền" as UC_Auth <<Include>>
+        usecase "Xác thực JWT & Kiểm tra Phân quyền" as UC_Auth <<Extend>>
     }
 
     package "Phân hệ 2: Quản lý Thành viên & Ban Chuyên môn" {
@@ -447,22 +447,22 @@ rectangle "Hệ Thống Quản Lý Câu Lạc Bộ Sinh Viên Tích Hợp AI" {
     package "Phân hệ 3: Quản lý Sự kiện & Điểm danh QR" {
         usecase "UC04: Quản lý Sự kiện & Sinh mã QR" as UC04
         usecase "UC09: Quét mã QR Điểm danh" as UC09
-        usecase "Sinh chuỗi QR độc bản (UUID)" as UC_GenQR <<Include>>
+        usecase "Sinh chuỗi QR độc bản (UUID)" as UC_GenQR <<Extend>>
     }
 
     package "Phân hệ 4: Quản lý Nhiệm vụ & Kanban Board" {
         usecase "UC05: Quản lý Nhiệm vụ & Kanban Board" as UC05
         usecase "UC10: Cập nhật Tiến độ Task của mình" as UC10
-        usecase "Kiểm soát RBAC sửa Task (Chặn 403)" as UC_RBAC <<Include>>
+        usecase "Kiểm soát RBAC sửa Task (Chặn 403)" as UC_RBAC <<Extend>>
     }
 
-    package "Phân hệ 5: Trợ lý AI & Báo cáo Thống kê" {
+    package "Phân hệ 5: Báo cáo Thống kê" {
         usecase "UC06: AI Gợi ý Phân công Nhiệm vụ" as UC06
         usecase "UC07: AI Sinh Bài đăng Thông báo" as UC07
         usecase "UC08: AI Tóm tắt Kết quả Hoạt động" as UC08
         usecase "UC03: Tra cứu Lịch sử & Bảng xếp hạng" as UC03
-        usecase "So khớp Kỹ năng & Fallback Rule" as UC_Match <<Include>>
-        usecase "Tính điểm Contribution Score" as UC_Score <<Include>>
+        usecase "So khớp Kỹ năng & Fallback Rule" as UC_Match <<Extend>>
+        usecase "Tính điểm Contribution Score" as UC_Score <<Extend>>
     }
 }
 
@@ -491,11 +491,11 @@ Admin --> UC11
 Admin --> UC12
 
 ' Include Relationships
-UC04 ..> UC_GenQR : <<include>>
-UC09 ..> UC_Auth : <<include>>
-UC10 ..> UC_RBAC : <<include>>
-UC06 ..> UC_Match : <<include>>
-UC03 ..> UC_Score : <<include>>
+UC04 ..> UC_GenQR : <<extend>>
+UC09 ..> UC_Auth : <<extend>>
+UC10 ..> UC_RBAC : <<extend>>
+UC06 ..> UC_Match : <<extend>>
+UC03 ..> UC_Score : <<extend>>
 
 ' Extend Relationships
 UC05 <.. UC06 : <<extend>>
@@ -540,12 +540,12 @@ rectangle "Phân hệ 1: Xác thực & Phân quyền (Auth & RBAC)" {
 }
 
 User --> UC01
-UC01 ..> UC01_P : <<include>>
-UC01 ..> UC01_JWT : <<include>>
+UC01 ..> UC01_P : <<extend>>
+UC01 ..> UC01_JWT : <<extend>>
 
 Admin --> UC12
-UC12 ..> UC12_Role : <<include>>
-UC12 ..> UC12_Lock : <<include>>
+UC12 ..> UC12_Role : <<extend>>
+UC12 ..> UC12_Lock : <<extend>>
 @enduml
 ```
 
@@ -575,12 +575,12 @@ rectangle "Phân hệ 2: Quản lý Thành viên & Ban Chuyên môn" {
 }
 
 Member --> UC02
-UC02 ..> UC02_Skill : <<include>>
-UC02 ..> UC02_Slot : <<include>>
+UC02 ..> UC02_Skill : <<extend>>
+UC02 ..> UC02_Slot : <<extend>>
 
 Admin --> UC11
-UC11 ..> UC11_Dept : <<include>>
-UC11 ..> UC11_Assign : <<include>>
+UC11 ..> UC11_Dept : <<extend>>
+UC11 ..> UC11_Assign : <<extend>>
 @enduml
 ```
 
@@ -610,12 +610,12 @@ rectangle "Phân hệ 3: Quản lý Sự kiện & Điểm danh QR" {
 }
 
 Leader --> UC04
-UC04 ..> UC04_Create : <<include>>
-UC04 ..> UC04_QR : <<include>>
+UC04 ..> UC04_Create : <<extend>>
+UC04 ..> UC04_QR : <<extend>>
 
 Member --> UC09
-UC09 ..> UC09_Verify : <<include>>
-UC09 ..> UC09_Unique : <<include>>
+UC09 ..> UC09_Verify : <<extend>>
+UC09 ..> UC09_Unique : <<extend>>
 @enduml
 ```
 
@@ -645,19 +645,19 @@ rectangle "Phân hệ 4: Quản lý Nhiệm vụ & Kanban Board" {
 }
 
 Leader --> UC05
-UC05 ..> UC05_Create : <<include>>
-UC05 ..> UC05_Assign : <<include>>
-UC05 ..> UC05_Move : <<include>>
+UC05 ..> UC05_Create : <<extend>>
+UC05 ..> UC05_Assign : <<extend>>
+UC05 ..> UC05_Move : <<extend>>
 
 Member --> UC10
-UC10 ..> UC10_RBAC : <<include>>
+UC10 ..> UC10_RBAC : <<extend>>
 @enduml
 ```
 
-#### 4.3.5 Phân hệ 5: Trợ lý Trí tuệ Nhân tạo & Báo cáo Thống kê (AI Services & Analytics Subsystem)
-``![Hình 4.3.5: Use Case Phân hệ Trợ lý AI & Báo cáo Thống kê](../images/usecase_sub5_ai.png)
+#### 4.3.5 Phân hệ 5: Báo cáo Thống kê (Reporting & Analytics Subsystem)
+``![Hình 4.3.5: Use Case Phân hệ Báo cáo Thống kê Thống kê](../images/usecase_sub5_ai.png)
 
-*Hình 4.3.5: Use Case Phân hệ Trợ lý AI & Báo cáo Thống kê (UC03, UC06, UC07, UC08)*
+*Hình 4.3.5: Use Case Phân hệ Báo cáo Thống kê Thống kê (UC03, UC06, UC07, UC08)*
 
 `plantuml
 @startuml usecase_sub5_ai
@@ -671,7 +671,7 @@ actor "Trưởng ban / BCN" as Leader
 actor "Người dùng" as User
 actor "AI Service (Gemini/Fallback)" as AI <<System>>
 
-rectangle "Phân hệ 5: Trợ lý AI & Báo cáo Thống kê" {
+rectangle "Phân hệ 5: Báo cáo Thống kê" {
     usecase "UC06: AI Gợi ý Phân công Thông minh" as UC06
     usecase "UC07: AI Sinh Bài đăng Truyền thông" as UC07
     usecase "UC08: AI Tóm tắt Kết quả Hoạt động" as UC08
@@ -688,7 +688,7 @@ AI <-- UC06
 AI <-- UC07
 AI <-- UC08
 
-UC03 ..> UC_Score : <<include>>
+UC03 ..> UC_Score : <<extend>>
 @enduml
 ```
 
@@ -1154,63 +1154,34 @@ stop
 
 ### 5.3 Biểu đồ Tuần tự (UML Sequence Diagrams)
 
-#### 5.3.1 Sequence Diagram 01: Xác thực Đăng nhập & Cấp JWT Token
+Hệ thống biểu đồ tuần tự được xây dựng theo chuẩn mô hình phân tích thiết kế BCE (Boundary - Control - Entity) với hệ thống **biểu tượng và huy hiệu nhận diện trực quan** chuẩn hóa:
+- **Biểu tượng Bộ điều khiển (Controller):** Hiển thị dạng hộp Participant với huy hiệu tròn **`(C)`** màu tím (`#818CF8`) và stereotype `«Controller»` gắn nhãn phân định rõ các Controller của Backend API Flask.
+- **Biểu tượng Giao diện (Boundary):** Hiển thị dạng hộp Participant với huy hiệu tròn **`(B)`** màu vàng hổ phách (`#F59E0B`) và stereotype `«Boundary»` gắn nhãn các màn hình / component React.
+- **Biểu tượng Dịch vụ (Service):** Hiển thị dạng hộp Participant với huy hiệu tròn **`(S)`** màu xanh ngọc (`#10B981`) và stereotype `«Service»` cho các mô-đun dịch vụ logic nội bộ (`AIService Engine`, `Security Module`).
+- **Biểu tượng Dịch vụ Ngoài (External AI):** Hiển thị huy hiệu **`(E)`** màu xanh cyan (`#06B6D4`) `«External AI»` cho `Google Gemini API`.
+- **Biểu tượng Fallback Engine:** Hiển thị huy hiệu **`(F)`** màu xám (`#64748B`) `«Fallback Engine»` cho `Local Rule Matcher`.
+- **Biểu tượng Cơ sở dữ liệu:** Hiển thị biểu tượng hình trụ database tiêu chuẩn cho `PostgreSQL DB`.
+
+---
+
+#### 5.3.1 Sequence Diagram 01: Xác thực Đăng nhập & Cấp JWT Token (UC01)
+- **Giao diện (B) «Boundary»:** `LoginView (Login.jsx)` - Nhận tương tác nhập tài khoản/mật khẩu và điều hướng sau khi xác thực.
+- **Bộ điều khiển (C) «Controller»:** `AuthController (auth.py)` - Tiếp nhận endpoint `/api/v1/auth/login`, điều phối kiểm tra mật khẩu và cấp phát JWT token.
+- **Dịch vụ (S) «Service»:** `Security Module (Bcrypt / JWT)` - Thực thi hàm kiểm tra băm mật khẩu `verify_password` và tạo chuỗi token `create_access_token`.
+- **Cơ sở dữ liệu:** `PostgreSQL DB` - Lưu trữ bảng `users` và trường mật khẩu đã băm `password_hash`.
+
 ``![Hình 5.3.1: Tuần tự Xác thực Đăng nhập & Điều hướng vai trò](../images/sequence_auth_login.png)
 
 *Hình 5.3.1: Tuần tự Xác thực Đăng nhập & Điều hướng vai trò*
 
-`plantuml
+```plantuml
 @startuml sequence_auth_login
-!theme plain
-skinparam backgroundColor #FFFFFF
-skinparam shadowing false
-skinparam roundcorner 8
-
-autonumber
-actor "Người dùng" as User
-participant "React Frontend (Vite)" as UI
-participant "Flask Auth Controller" as AuthCtrl
-participant "Security (bcrypt/JWT)" as Sec
-participant "PostgreSQL Database" as DB
-
-User -> UI : Nhập email, password & bấm "Đăng nhập"
-UI -> AuthCtrl : POST /api/auth/login {email, password}
-AuthCtrl -> DB : SELECT * FROM users WHERE email = :email
-DB --> AuthCtrl : Trả về User Entity (password_hash, role)
-
-alt Người dùng không tồn tại
-    AuthCtrl --> UI : HTTP 401 Unauthorized {"message": "Email không tồn tại"}
-    UI --> User : Hiển thị thông báo lỗi
-else Người dùng tồn tại
-    AuthCtrl -> Sec : bcrypt.checkpw(password, password_hash)
-    alt Sai mật khẩu
-        Sec --> AuthCtrl : False
-        AuthCtrl --> UI : HTTP 401 Unauthorized {"message": "Mật khẩu không đúng"}
-        UI --> User : Hiển thị thông báo lỗi
-    else Đúng mật khẩu
-        Sec --> AuthCtrl : True
-        AuthCtrl -> Sec : create_access_token(user_id, role, expires_in=7d)
-        Sec --> AuthCtrl : JWT Token String
-        AuthCtrl --> UI : HTTP 200 OK {token, user: {id, full_name, role}}
-        UI -> UI : Lưu token vào localStorage & AuthContext
-        UI --> User : Chuyển hướng đến Dashboard tương ứng vai trò
-    end
-end
-@enduml
-```
-
-#### 5.3.2 Sequence Diagram 02: Quét Mã QR Điểm danh Sự kiện Realtime
-``![Hình 5.3.2: Tuần tự Quét QR Điểm danh Realtime & Chống gian lận](../images/sequence_qr_checkin.png)
-
-*Hình 5.3.2: Tuần tự Quét QR Điểm danh Realtime & Chống gian lận*
-
-`plantuml
-@startuml sequence_qr_checkin
-!theme plain
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
 
 skinparam sequence {
     ArrowColor #2563EB
@@ -1220,70 +1191,172 @@ skinparam sequence {
     ParticipantBorderColor #3B82F6
     ParticipantBackgroundColor #EFF6FF
     ParticipantFontColor #0F172A
+    DatabaseBorderColor #475569
+    DatabaseBackgroundColor #F8FAFC
+}
+
+title **BIỂU ĐỒ TUẦN TỰ: XÁC THỰC ĐĂNG NHẬP & CẤP JWT TOKEN (UC01)**
+
+autonumber
+actor "Người dùng\n(User / Sinh viên)" as User
+participant "Giao diện Đăng nhập\n(LoginView / Login.jsx)" as UI << (B,#F59E0B) Boundary >>
+participant "Bộ điều khiển Xác thực\n(AuthController / auth.py)" as AuthCtrl << (C,#818CF8) Controller >>
+participant "Mô-đun Bảo mật\n(Security / Bcrypt & JWT)" as Sec << (S,#10B981) Service >>
+database "Cơ sở dữ liệu\n(PostgreSQL DB)" as DB
+
+User -> UI : Nhập email, password & bấm "Đăng nhập"
+activate UI
+
+UI -> AuthCtrl : POST /api/v1/auth/login\n{username/email, password}
+activate AuthCtrl
+
+AuthCtrl -> DB : SELECT * FROM users WHERE email = :email
+activate DB
+DB --> AuthCtrl : Trả về thông tin User (password_hash, role, ...)
+deactivate DB
+
+alt Người dùng không tồn tại (User not found)
+    AuthCtrl --> UI : HTTP 401 Unauthorized\n{"detail": "Mật khẩu hoặc Email không chính xác"}
+    UI --> User : Hiển thị Toast thông báo lỗi đăng nhập
+else Người dùng tồn tại
+    AuthCtrl -> Sec : verify_password(password, user.password_hash)
+    activate Sec
+    alt Sai mật khẩu
+        Sec --> AuthCtrl : False (Mật khẩu không khớp)
+        AuthCtrl --> UI : HTTP 401 Unauthorized\n{"detail": "Mật khẩu hoặc Email không chính xác"}
+        UI --> User : Hiển thị Toast thông báo lỗi đăng nhập
+    else Đúng mật khẩu
+        Sec --> AuthCtrl : True (Mật khẩu hợp lệ)
+        AuthCtrl -> Sec : create_access_token(subject=user.id, expires_delta=7d)
+        Sec --> AuthCtrl : JWT Access Token String
+        deactivate Sec
+        AuthCtrl --> UI : HTTP 200 OK\n{"access_token": token, "token_type": "bearer", "user": {...}}
+        deactivate AuthCtrl
+        UI -> UI : Lưu token vào localStorage & cập nhật AuthContext
+        UI --> User : Điều hướng đến Dashboard theo vai trò (ADMIN/LEADER/MEMBER)
+        deactivate UI
+    end
+end
+@enduml
+```
+
+---
+
+#### 5.3.2 Sequence Diagram 02: Quét Mã QR Điểm danh Sự kiện Realtime (UC09)
+- **Giao diện (B) «Boundary»:** 
+  - `QRScannerModal (Activities.jsx)`: Màn hình quét mã QR của Thành viên qua Mobile Web Scanner.
+  - `ActivityDetailView / Leaderboard`: Màn hình theo dõi sĩ số và cập nhật kết quả điểm danh của Ban Chủ nhiệm.
+- **Bộ điều khiển (C) «Controller»:** `ActivitiesController (activities.py)` - Tiếp nhận endpoint `/api/v1/activities/checkin`, kiểm tra trạng thái sự kiện, chống điểm danh trùng lặp và xác thực tọa độ GPS Geofence qua công thức Haversine.
+- **Cơ sở dữ liệu:** `PostgreSQL DB` - Ghi nhận bảng `attendances` và tự động cộng 10 điểm cống hiến cho người tham gia.
+
+``![Hình 5.3.2: Tuần tự Quét QR Điểm danh Realtime & Chống gian lận](../images/sequence_qr_checkin.png)
+
+*Hình 5.3.2: Tuần tự Quét QR Điểm danh Realtime & Chống gian lận*
+
+```plantuml
+@startuml sequence_qr_checkin
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
+
+skinparam sequence {
+    ArrowColor #2563EB
+    ActorBorderColor #1D4ED8
+    LifeLineBorderColor #3B82F6
+    LifeLineBackgroundColor #DBEAFE
+    ParticipantBorderColor #3B82F6
+    ParticipantBackgroundColor #EFF6FF
+    ParticipantFontColor #0F172A
+    DatabaseBorderColor #475569
+    DatabaseBackgroundColor #F8FAFC
 }
 
 title **BIỂU ĐỒ TUẦN TỰ: QUÉT MÃ QR ĐIỂM DANH SỰ KIỆN REALTIME (UC09)**
 
 autonumber
 actor "Thành viên (Member)\nMobile Browser" as Member
-participant "React Frontend\n(Vite Check-in UI)" as UI
-participant "Flask Attendance API\n(Controller)" as Controller
-participant "PostgreSQL DB\n(Docker Container)" as DB
-actor "Trưởng ban (Leader)\nWeb Dashboard" as Leader
+participant "Giao diện Điểm danh\n(QRScannerModal / Activities.jsx)" as UI << (B,#F59E0B) Boundary >>
+participant "Bộ điều khiển Hoạt động\n(ActivitiesController / activities.py)" as ActCtrl << (C,#818CF8) Controller >>
+database "Cơ sở dữ liệu\n(PostgreSQL DB)" as DB
+participant "Giao diện Ban Chủ nhiệm\n(ActivityDetailView / Leaderboard)" as LeaderUI << (B,#F59E0B) Boundary >>
+actor "Trưởng ban / Admin\n(Organizer / Leader)" as Leader
 
-Member -> UI : Mở Camera / Web Scanner quét mã QR
-UI -> Controller : POST /api/attendance/checkin\n(Header: Bearer JWT, Body: {qr_token})
+Member -> UI : Mở Camera / Web Scanner quét mã Dynamic QR
+activate UI
 
-activate Controller
-Controller -> Controller : Xác thực JWT (@jwt_required)
+UI -> ActCtrl : POST /api/v1/activities/checkin\n(Header: Bearer JWT, Body: {activity_id, qr_code_hash, user_lat, user_lng})
+activate ActCtrl
 
-Controller -> DB : SELECT * FROM activities WHERE qr_code_token = :qr_token
+ActCtrl -> ActCtrl : Xác thực JWT (@jwt_required) & lấy current_user
+
+ActCtrl -> DB : SELECT * FROM activities WHERE id = :activity_id
 activate DB
-DB --> Controller : Trả về Activity record (status, time range)
+DB --> ActCtrl : Trả về Activity record (status, time range, lat, lng, radius)
 deactivate DB
 
-alt Mã QR không khớp hoặc sự kiện đã đóng
-    Controller --> UI : HTTP 400 Bad Request\n{"message": "Mã QR không hợp lệ hoặc sự kiện đã đóng"}
-    UI --> Member : Hiển thị Toast thông báo lỗi đỏ
-else Sự kiện đang diễn ra hợp lệ
-    Controller -> DB : SELECT * FROM attendances\nWHERE activity_id = :act_id AND user_id = :uid
+alt Sự kiện không tồn tại hoặc đã đóng điểm danh
+    ActCtrl --> UI : HTTP 400 Bad Request\n{"detail": "Sự kiện không hợp lệ hoặc đã đóng điểm danh"}
+    UI --> Member : Hiển thị Toast cảnh báo lỗi đỏ
+else Sự kiện đang mở điểm danh hợp lệ
+    ActCtrl -> DB : SELECT * FROM attendances\nWHERE activity_id = :act_id AND user_id = :uid
     activate DB
-    DB --> Controller : Kiểm tra bản ghi điểm danh
+    DB --> ActCtrl : Kiểm tra bản ghi điểm danh hiện có
     deactivate DB
     
-    alt Đã điểm danh trước đó
-        Controller --> UI : HTTP 409 Conflict\n{"message": "Bạn đã điểm danh sự kiện này rồi"}
+    alt Đã điểm danh trước đó (Trùng lặp)
+        ActCtrl --> UI : HTTP 400 Bad Request\n{"detail": "Bạn (hoặc thành viên này) đã được điểm danh rồi!"}
         UI --> Member : Hiển thị cảnh báo điểm danh trùng lặp
-    else Chưa điểm danh
-        Controller -> DB : INSERT INTO attendances\n(activity_id, user_id, checkin_time, method)
-        activate DB
-        Controller -> DB : UPDATE users SET contribution_score = contribution_score + 10\nWHERE id = :uid
-        DB --> Controller : Commit Transaction thành công
-        deactivate DB
-        
-        Controller --> UI : HTTP 200 OK\n{"message": "Điểm danh thành công", "points_earned": 10}
-        UI --> Member : Hiệu ứng Checkmark xanh & Thông báo +10 điểm
-        
-        Controller -->> Leader : WebSocket / Polling Refresh Leaderboard
+    else Chưa điểm danh & Kiểm tra GPS Geofence
+        ActCtrl -> ActCtrl : haversine_distance(user_coords, act_coords) <= allowed_radius
+        alt Ngoài phạm vi GPS cho phép
+            ActCtrl --> UI : HTTP 400 Bad Request\n{"detail": "Vị trí điểm danh ngoài phạm vi cho phép"}
+            UI --> Member : Cảnh báo yêu cầu đến gần hội trường sự kiện
+        else Hợp lệ toàn diện (Điểm danh thành công)
+            ActCtrl -> DB : INSERT INTO attendances (activity_id, user_id, checkin_time, status='PRESENT')
+            activate DB
+            ActCtrl -> DB : UPDATE users SET contribution_score = contribution_score + 10 WHERE id = :uid
+            DB --> ActCtrl : Transaction Commit thành công
+            deactivate DB
+            
+            ActCtrl --> UI : HTTP 201 Created\n{"id": att_id, "status": "PRESENT", "user_name": full_name}
+            deactivate ActCtrl
+            UI --> Member : Hiệu ứng Checkmark xanh & Thông báo "+10 Điểm cống hiến"
+            deactivate UI
+            
+            ActCtrl -->> LeaderUI : WebSocket / Polling Broadcast sự kiện check-in realtime
+            activate LeaderUI
+            LeaderUI --> Leader : Cập nhật danh sách điểm danh & Tăng sĩ số có mặt tức thì
+            deactivate LeaderUI
+        end
     end
 end
-deactivate Controller
-
 @enduml
 ```
 
-#### 5.3.3 Sequence Diagram 03: AI Gợi ý Phân công Nhiệm vụ với Dual-Engine Fallback
+---
+
+#### 5.3.3 Sequence Diagram 03: AI Gợi ý Phân công Nhiệm vụ với Dual-Engine Fallback (UC06)
+- **Giao diện (B) «Boundary»:** `TaskKanbanView / AIHub.jsx` - Giao diện chọn nhiệm vụ, kích hoạt gợi ý AI và hiển thị bảng ghép cặp nhân sự trực quan.
+- **Bộ điều khiển (C) «Controller» (Phân tách 2 Controller độc lập):**
+  1. `AIController (ai.py)`: Xử lý request `/api/v1/ai/suggest-assignments`, chuẩn bị dữ liệu kỹ năng/lịch rảnh và điều phối dịch vụ AI.
+  2. `TasksController (tasks.py)`: Xử lý request `/api/v1/tasks/assign` sau khi Trưởng ban xem xét và nhấn "Áp dụng Phân công", tiến hành lưu phân công hàng loạt vào CSDL.
+- **Dịch vụ & AI Engine:** `AIService Engine (S) «Service»`, `Google Gemini API (E) «External AI»`, `Local Rule Matcher (F) «Fallback Engine»` (< 100ms switch) và `PostgreSQL DB`.
+
 ``![Hình 5.3.3: Tuần tự AI Gợi ý Phân công với Dual Fallback](../images/sequence_ai_matchmaking.png)
 
 *Hình 5.3.3: Tuần tự AI Gợi ý Phân công với Dual Fallback (< 100ms switch)*
 
-`plantuml
+```plantuml
 @startuml sequence_ai_matchmaking
-!theme plain
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
 
 skinparam sequence {
     ArrowColor #2563EB
@@ -1293,92 +1366,115 @@ skinparam sequence {
     ParticipantBorderColor #3B82F6
     ParticipantBackgroundColor #EFF6FF
     ParticipantFontColor #0F172A
+    DatabaseBorderColor #475569
+    DatabaseBackgroundColor #F8FAFC
 }
 
 title **BIỂU ĐỒ TUẦN TỰ: AI GỢI Ý PHÂN CÔNG NHIỆM VỤ VỚI DUAL-ENGINE FALLBACK (UC06)**
 
 autonumber
 actor "Trưởng ban (Leader)" as Leader
-participant "React Task Kanban\n(Frontend)" as UI
-participant "Flask Task Controller\n(Backend API)" as Controller
-participant "AIService Engine\n(Service Layer)" as AIService
-participant "Google Gemini API\n(Cloud LLM)" as Gemini
-participant "Local Rule Engine\n(Fallback Matcher)" as Fallback
-participant "PostgreSQL DB\n(Database)" as DB
+participant "Giao diện Bảng việc\n(TaskKanbanView / AIHub.jsx)" as UI << (B,#F59E0B) Boundary >>
+participant "Bộ điều khiển AI\n(AIController / ai.py)" as AICtrl << (C,#818CF8) Controller >>
+participant "Bộ điều khiển Nhiệm vụ\n(TasksController / tasks.py)" as TaskCtrl << (C,#818CF8) Controller >>
+participant "Dịch vụ AI Thông minh\n(AIService Engine)" as AIService << (S,#10B981) Service >>
+participant "Google Gemini API\n(Cloud LLM)" as Gemini << (E,#06B6D4) External AI >>
+participant "Bộ khớp Quy tắc Cục bộ\n(Local Rule Matcher)" as Fallback << (F,#64748B) Fallback Engine >>
+database "Cơ sở dữ liệu\n(PostgreSQL DB)" as DB
 
-Leader -> UI : Bấm nút "AI Gợi ý Phân công" (Activity ID)
-UI -> Controller : POST /api/ai/suggest-assignments {activity_id}
+== Giai đoạn 1: AI Phân tích & Gợi ý Phân công (Dual-Engine Fallback) ==
 
-activate Controller
-Controller -> Controller : Kiểm tra quyền Leader/Admin (@roles_required)
-Controller -> DB : Truy vấn Tasks chưa gán & Members (Skills, Free Slots)
+Leader -> UI : Chọn các Task cần phân công & nhấn "AI Gợi ý Phân công"
+activate UI
+
+UI -> AICtrl : POST /api/v1/ai/suggest-assignments\n{task_ids: [1, 2, 3]}
+activate AICtrl
+
+AICtrl -> AICtrl : Kiểm tra quyền Leader/Admin (@jwt_required)
+AICtrl -> DB : SELECT Tasks theo task_ids & SELECT Users (skills, free_slots)
 activate DB
-DB --> Controller : Trả về Task List & Member List
+DB --> AICtrl : Trả về Task List & Member List
 deactivate DB
 
-Controller -> AIService : match_tasks_to_members(tasks, members)
+AICtrl -> AIService : suggest_assignments(tasks_data, members_data)
 activate AIService
-AIService -> AIService : Chuẩn bị Prompt & Context JSON
+AIService -> AIService : Xây dựng Prompt & chuẩn bị Context JSON
 
 alt Kết nối Internet tốt & API Key hợp lệ
-    AIService -> Gemini : POST /v1beta/models/gemini-pro:generateContent (JSON Payload)
+    AIService -> Gemini : POST /v1beta/models/gemini-pro:generateContent (Prompt JSON)
     activate Gemini
     alt Gemini phản hồi thành công (< 5s)
-        Gemini --> AIService : Raw JSON String
+        Gemini --> AIService : Raw JSON kết quả phân công
         deactivate Gemini
-        AIService -> AIService : Parse & Validate bằng Pydantic Schema
-    else Gemini Timeout / Lỗi Quota 429
-        AIService -> Fallback : execute_rule_matching(tasks, members)
+        AIService -> AIService : Parse JSON & Validate Pydantic Schema
+    else Gemini Timeout (> 5s) / Lỗi Quota 429
+        AIService -> Fallback : Fallback sang execute_rule_matching(tasks, members)
         activate Fallback
-        Fallback --> AIService : Heuristic Match Results (< 100ms)
+        Fallback --> AIService : Heuristic Match Suggestions (< 100ms)
         deactivate Fallback
     end
 else Mất mạng Internet / Chế độ Offline
-    AIService -> Fallback : execute_rule_matching(tasks, members)
+    AIService -> Fallback : Chuyển mạch tức thì execute_rule_matching(tasks, members)
     activate Fallback
-    Fallback --> AIService : Heuristic Match Results (< 100ms)
+    Fallback --> AIService : Heuristic Match Suggestions (< 100ms)
     deactivate Fallback
 end
 
-AIService -> DB : INSERT INTO ai_logs (feature, prompt, response, engine, time_ms)
+AIService -> DB : INSERT INTO ai_logs (prompt_type='RECOMMEND', input_data, output_result)
 activate DB
-DB --> AIService : Log saved
+DB --> AIService : Log saved OK
 deactivate DB
 
-AIService --> Controller : Validated List[AssignmentSuggestion]
+AIService --> AICtrl : Validated List[AssignmentSuggestion]
 deactivate AIService
 
-Controller --> UI : HTTP 200 OK {suggestions: [{task_id, user_id, match_score, reason}, ...]}
-deactivate Controller
+AICtrl --> UI : HTTP 200 OK\n{suggestions: [{task_id, user_id, match_score, reason}, ...]}
+deactivate AICtrl
 
-UI --> Leader : Hiển thị Bảng ghép cặp đề xuất kèm Match Score %
+UI --> Leader : Hiển thị Modal/Drawer đề xuất kèm Match Score % và Lý do
 
-Leader -> UI : Xem xét, tinh chỉnh nhân sự & bấm "Áp dụng Phân công"
-UI -> Controller : POST /api/tasks/batch-assign {assignments}
-activate Controller
-Controller -> DB : UPDATE tasks & INSERT INTO task_assignments
+== Giai đoạn 2: Trưởng ban Phê duyệt & Áp dụng Phân công ==
+
+Leader -> UI : Xem xét, tinh chỉnh nhân sự & nhấn "Áp dụng Phân công"
+UI -> TaskCtrl : POST /api/v1/tasks/assign\n{task_id, user_id, ai_suggested: true, match_score}
+activate TaskCtrl
+
+TaskCtrl -> TaskCtrl : Kiểm tra quyền Leader/Admin (@roles_required)
+TaskCtrl -> DB : INSERT INTO task_assignments & UPDATE tasks SET status='IN_PROGRESS'
 activate DB
-DB --> Controller : Commit OK
+DB --> TaskCtrl : Commit Transaction thành công
 deactivate DB
-Controller --> UI : HTTP 200 OK {"message": "Đã phân công thành công"}
-deactivate Controller
-UI --> Leader : Cập nhật Kanban Board tức thì
+
+TaskCtrl --> UI : HTTP 200 OK {"message": "Đã phân công thành công"}
+deactivate TaskCtrl
+
+UI --> Leader : Cập nhật Kanban Board tức thì & hiển thị Avatar nhân sự
+deactivate UI
 
 @enduml
 ```
 
-#### 5.3.4 Sequence Diagram 04: Cập nhật Trạng thái Task trên Kanban Board với Kiểm soát RBAC
+---
+
+#### 5.3.4 Sequence Diagram 04: Cập nhật Trạng thái Task trên Kanban Board với Kiểm soát RBAC (UC05 & UC10)
+- **Giao diện (B) «Boundary»:** `KanbanBoard (Tasks.jsx)` - Cho phép kéo thả thẻ nhiệm vụ giữa các cột trạng thái (To-Do, In-Progress, Done).
+- **Bộ điều khiển (C) «Controller»:** `TasksController (tasks.py)` - Tiếp nhận endpoint `PUT /api/v1/tasks/:id/status`, thực thi kiểm soát phân quyền RBAC đa cấp:
+  - `ADMIN / LEADER`: Được phép cập nhật trạng thái mọi nhiệm vụ trong ban.
+  - `MEMBER`: Chỉ được phép cập nhật nhiệm vụ do chính mình phụ trách (`task.assigned_user_id == current_user.id`). Nếu can thiệp việc của thành viên khác, Controller sẽ lập tức chặn và trả mã lỗi `HTTP 403 Forbidden`, giao diện tự động hoàn trả thẻ về vị trí cũ.
+- **Cơ sở dữ liệu:** `PostgreSQL DB` - Cập nhật trạng thái `tasks` và tự động cộng 20 điểm cống hiến cho thành viên hoàn thành nhiệm vụ.
+
 ``![Hình 5.3.4: Tuần tự Cập nhật Task Kanban với Kiểm soát RBAC](../images/sequence_kanban_rbac.png)
 
 *Hình 5.3.4: Tuần tự Cập nhật Task Kanban với Kiểm soát RBAC (HTTP 401/403)*
 
-`plantuml
+```plantuml
 @startuml sequence_kanban_rbac
-!theme plain
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
 
 skinparam sequence {
     ArrowColor #2563EB
@@ -1388,53 +1484,58 @@ skinparam sequence {
     ParticipantBorderColor #3B82F6
     ParticipantBackgroundColor #EFF6FF
     ParticipantFontColor #0F172A
+    DatabaseBorderColor #475569
+    DatabaseBackgroundColor #F8FAFC
 }
 
 title **BIỂU ĐỒ TUẦN TỰ: CẬP NHẬT TRẠNG THÁI TASK KANBAN VỚI KIỂM SOÁT RBAC (UC05 & UC10)**
 
 autonumber
-actor "Người dùng (Member / Leader)" as User
-participant "React Kanban UI\n(Vite Component)" as UI
-participant "Flask Task Controller\n(Backend REST API)" as Controller
-participant "PostgreSQL DB\n(Docker Database)" as DB
+actor "Người dùng\n(Member / Leader / Admin)" as User
+participant "Giao diện Bảng việc\n(KanbanBoard / Tasks.jsx)" as UI << (B,#F59E0B) Boundary >>
+participant "Bộ điều khiển Nhiệm vụ\n(TasksController / tasks.py)" as TaskCtrl << (C,#818CF8) Controller >>
+database "Cơ sở dữ liệu\n(PostgreSQL DB)" as DB
 
 User -> UI : Kéo thả thẻ Task sang cột [DONE]
-UI -> Controller : PATCH /api/tasks/:id/status {status: "DONE"}\n(Headers: Bearer JWT Token)
+activate UI
 
-activate Controller
-Controller -> Controller : Xác thực JWT & lấy current_user (id, role)
+UI -> TaskCtrl : PUT /api/v1/tasks/:id/status {status: "DONE"}\n(Headers: Bearer JWT Token)
+activate TaskCtrl
 
-Controller -> DB : SELECT * FROM tasks WHERE id = :id
+TaskCtrl -> TaskCtrl : Xác thực JWT & lấy current_user (id, role)
+
+TaskCtrl -> DB : SELECT * FROM tasks WHERE id = :id\nSELECT * FROM task_assignments WHERE task_id = :id
 activate DB
-DB --> Controller : Trả về Task Entity (created_by, assignee_id, status)
+DB --> TaskCtrl : Trả về Task Entity & TaskAssignment (assigned_user_id)
 deactivate DB
 
 alt Vai trò là ADMIN hoặc LEADER
-    Controller -> DB : UPDATE tasks SET status = 'DONE', updated_at = NOW() WHERE id = :id
+    TaskCtrl -> DB : UPDATE tasks SET status = 'DONE' WHERE id = :id
     activate DB
-    Controller -> DB : UPDATE users SET contribution_score = contribution_score + 20 WHERE id = :assignee_id
-    DB --> Controller : Commit OK
+    TaskCtrl -> DB : UPDATE users SET contribution_score = contribution_score + 20 WHERE id = :assigned_user_id
+    DB --> TaskCtrl : Commit Transaction thành công
     deactivate DB
     
-    Controller --> UI : HTTP 200 OK {"message": "Cập nhật thành công"}
-    UI --> User : Cố định thẻ Task tại cột DONE + Toast thông báo xanh
-else Vai trò là MEMBER
-    alt current_user.id == task.assignee_id (Chính chủ nhiệm vụ)
-        Controller -> DB : UPDATE tasks SET status = 'DONE', updated_at = NOW() WHERE id = :id
+    TaskCtrl --> UI : HTTP 200 OK {"id": task_id, "status": "DONE", "message": "Cập nhật thành công"}
+    UI --> User : Cố định thẻ Task tại cột DONE + Toast thông báo thành công
+else Vai trò là MEMBER (Thành viên)
+    alt current_user.id == task.assigned_user_id (Chính chủ nhiệm vụ)
+        TaskCtrl -> DB : UPDATE tasks SET status = 'DONE' WHERE id = :id
         activate DB
-        Controller -> DB : UPDATE users SET contribution_score = contribution_score + 20 WHERE id = :assignee_id
-        DB --> Controller : Commit OK
+        TaskCtrl -> DB : UPDATE users SET contribution_score = contribution_score + 20 WHERE id = :assigned_user_id
+        DB --> TaskCtrl : Commit Transaction thành công
         deactivate DB
         
-        Controller --> UI : HTTP 200 OK {"message": "Cập nhật thành công"}
-        UI --> User : Cố định thẻ Task tại cột DONE + Toast thông báo xanh
-    else current_user.id != task.assignee_id (Không phải người được giao việc)
-        Controller --> UI : HTTP 403 Forbidden\n{"message": "Bạn không có quyền sửa nhiệm vụ của thành viên khác"}
+        TaskCtrl --> UI : HTTP 200 OK {"id": task_id, "status": "DONE", "message": "Cập nhật thành công"}
+        UI --> User : Cố định thẻ Task tại cột DONE + Toast thông báo thành công
+    else current_user.id != task.assigned_user_id (Không phải người được giao việc)
+        TaskCtrl --> UI : HTTP 403 Forbidden\n{"detail": "Thành viên chỉ có quyền cập nhật trạng thái nhiệm vụ do chính mình phụ trách"}
         UI -> UI : Rollback thẻ Task về vị trí cột ban đầu
-        UI --> User : Toast cảnh báo đỏ "RBAC Access Denied"
+        UI --> User : Toast cảnh báo đỏ "Truy cập bị từ chối (RBAC 403 Forbidden)"
     end
 end
-deactivate Controller
+deactivate TaskCtrl
+deactivate UI
 
 @enduml
 ```
@@ -1643,6 +1744,80 @@ FlaskApp --> OpenAIAPI : HTTPS REST Request (Port 443)
 
 @enduml
 ```
+
+---
+
+### 5.6 Sơ đồ Phân luồng Màn hình Giao diện Ứng dụng (React-Vite SPA Screen Flow Diagram)
+![Hình 5.6: Sơ đồ Phân luồng 8 Màn hình Giao diện Ứng dụng React-Vite SPA](../images/screenflow_diagram.png)
+
+*Hình 5.6: Sơ đồ Phân luồng 8 Màn hình Giao diện Ứng dụng React-Vite SPA (Screen Flow Diagram)*
+
+```plantuml
+@startuml screenflow_diagram
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam state {
+    BackgroundColor #F8FAFC
+    BorderColor #2563EB
+    FontColor #0F172A
+    ArrowColor #1D4ED8
+}
+
+title **SƠ ĐỒ PHÂN LUỒNG MÀN HÌNH ỨNG DỤNG (SCREEN FLOW DIAGRAM)\nHỆ THỐNG QUẢN LÝ CÂU LẠC BỘ SINH VIÊN TÍCH HỢP AI (REACT-VITE SPA)**
+
+state "<b>SCR-01: Màn hình Đăng nhập</b>\n---\n* Email & Mật khẩu Bcrypt\n* Xác thực JWT Access Token\n* Điều hướng theo Vai trò (RBAC)" as SCR01 #FEF3C7
+state "<b>SCR-02: Dashboard Tổng quan</b>\n---\n* KPI Chỉ số CLB (Thành viên, Sự kiện, Task)\n* Thông báo & Lịch hoạt động tuần\n* Thanh điều hướng Sidebar chính" as SCR02 #DBEAFE
+state "<b>SCR-03: Quản lý Thành viên</b>\n---\n* Danh sách thành viên & Lọc Ban\n* Ma trận Kỹ năng (Skill Matrix)\n* Lịch rảnh cá nhân (Free Slots)\n* Cập nhật Profile (Pydantic Schema)" as SCR03 #E0E7FF
+state "<b>SCR-04: Quản lý Ban Chuyên môn</b>\n---\n* Danh sách 4 Ban chuyên môn\n* Bổ nhiệm / Miễn nhiệm Trưởng ban\n* Điều chuyển nhân sự giữa các ban" as SCR04 #F3E8FF
+state "<b>SCR-05: Quản lý Sự kiện & QR</b>\n---\n* Tạo & Lên lịch sự kiện\n* Trình chiếu QR Check-in độc bản\n* Quét QR điểm danh qua Web Cam/Mobile\n* Thống kê tỷ lệ tham gia realtime" as SCR05 #D1FAE5
+state "<b>SCR-06: Bảng Nhiệm vụ Kanban</b>\n---\n* Trực quan hóa 3 cột: To-Do, In-Progress, Done\n* Kéo thả cập nhật trạng thái (RBAC check)\n* Gán Deadline & Kỹ năng yêu cầu" as SCR06 #FEE2E2
+state "<b>SCR-07: AI Hub - Smart Matchmaking</b>\n---\n* Gợi ý phân công nhiệm vụ tự động\n* Tính toán Match Score % (Skills + Free Time)\n* Dual-Engine Fallback (Gemini / Rule Engine)\n* Leader phê duyệt 1-click" as SCR07 #CCFBF1
+state "<b>SCR-08: AI Hub - Generator & Summary</b>\n---\n* Sinh bài đăng truyền thông sự kiện (Multi-tone)\n* Tóm tắt báo cáo hoạt động 3 phần\n* Sao chép & Xuất bản nhanh" as SCR08 #EDE9FE
+
+[*] --> SCR01 : Khởi động ứng dụng
+
+SCR01 --> SCR02 : Đăng nhập thành công (Cấp JWT Token)
+
+SCR02 --> SCR03 : Chọn 'Quản lý Thành viên'
+SCR03 --> SCR02 : Quay lại Dashboard
+
+SCR02 --> SCR04 : Chọn 'Ban Chuyên môn'
+SCR04 --> SCR02 : Quay lại Dashboard
+
+SCR02 --> SCR05 : Chọn 'Sự kiện & Điểm danh'
+SCR05 --> SCR02 : Quay lại Dashboard
+
+SCR02 --> SCR06 : Chọn 'Bảng Nhiệm vụ Kanban'
+SCR06 --> SCR02 : Quay lại Dashboard
+
+SCR06 --> SCR07 : Nhấp 'AI Gợi ý Phân công'
+SCR07 --> SCR06 : Phê duyệt & Cập nhật Task
+
+SCR05 --> SCR08 : Nhấp 'AI Sinh thông báo / Tóm tắt'
+SCR08 --> SCR05 : Áp dụng nội dung bài đăng
+
+SCR02 --> SCR01 : Đăng xuất (Thu hồi JWT Token)
+
+@enduml
+```
+
+Chi tiết phân quyền truy cập, tuyến đường điều hướng và các ca sử dụng ánh xạ tương ứng trên 08 màn hình giao diện được tổng hợp tại bảng dưới đây:
+
+| Mã SCR | Tên Màn hình | Tuyến đường (Route) | Phân quyền RBAC | Chức năng & Nghiệp vụ Trọng tâm | Use Case Ánh xạ |
+| :---: | :--- | :--- | :--- | :--- | :---: |
+| **SCR-01** | Đăng nhập / Đăng ký | `/login`, `/register` | Public (Tất cả) | Xác thực email/mật khẩu qua Bcrypt, cấp JWT Access Token, lưu trữ LocalStorage. | UC01, UC12 |
+| **SCR-02** | Dashboard Tổng quan | `/dashboard` | Admin, Leader, Member | Hiển thị 4 thẻ KPI thống kê, Lịch hoạt động tuần và Bảng xếp hạng Leaderboard. | UC03 |
+| **SCR-03** | Quản lý Thành viên | `/members` | Admin, Leader, Member | Xem danh bạ thành viên, lọc theo Ban; Modal cập nhật Ma trận Kỹ năng & Lịch rảnh. | UC02 |
+| **SCR-04** | Quản lý Ban Chuyên môn | `/departments` | Admin | Xem cơ cấu 4 Ban, tạo Ban mới, bổ nhiệm Trưởng ban, điều chuyển nhân sự giữa các ban. | UC11 |
+| **SCR-05** | Quản lý Sự kiện & QR | `/activities` | Leader, Admin, Member | Tạo sự kiện, kích hoạt sự kiện, mở Modal Trình chiếu Dynamic QR Code độc bản; quét check-in. | UC04, UC09 |
+| **SCR-06** | Bảng Nhiệm vụ Kanban | `/tasks` | Admin, Leader, Member | Bảng Kanban 3 cột trực quan (To-Do, In-Progress, Done), kéo-thả task, siết chặt RBAC. | UC05, UC10 |
+| **SCR-07** | AI Gợi ý Phân công | `/aihub` (Matchmaking) | Leader, Admin | Gợi ý phân công nhiệm vụ tự động, tính Match Score %, hỗ trợ Dual-Engine Fallback. | UC06 |
+| **SCR-08** | AI Sinh thông báo & Tóm tắt | `/aihub` (Gen/Summary) | Leader, Admin | Sinh bài đăng sự kiện đa phong cách (Fun/Formal) kèm emoji; Tóm tắt báo cáo 3 phần chuẩn. | UC07, UC08 |
 
 ---
 

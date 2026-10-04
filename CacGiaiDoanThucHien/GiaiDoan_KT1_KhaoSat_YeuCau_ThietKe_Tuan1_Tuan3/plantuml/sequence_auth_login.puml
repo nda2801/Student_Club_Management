@@ -1,37 +1,63 @@
 @startuml sequence_auth_login
-!theme plain
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
+
+skinparam sequence {
+    ArrowColor #2563EB
+    ActorBorderColor #1D4ED8
+    LifeLineBorderColor #3B82F6
+    LifeLineBackgroundColor #DBEAFE
+    ParticipantBorderColor #3B82F6
+    ParticipantBackgroundColor #EFF6FF
+    ParticipantFontColor #0F172A
+    DatabaseBorderColor #475569
+    DatabaseBackgroundColor #F8FAFC
+}
+
+title **BIỂU ĐỒ TUẦN TỰ: XÁC THỰC ĐĂNG NHẬP & CẤP JWT TOKEN (UC01)**
 
 autonumber
-actor "Người dùng" as User
-participant "React Frontend (Vite)" as UI
-participant "Flask Auth Controller" as AuthCtrl
-participant "Security (bcrypt/JWT)" as Sec
-participant "PostgreSQL Database" as DB
+actor "Người dùng\n(User / Sinh viên)" as User
+participant "Giao diện Đăng nhập\n(LoginView / Login.jsx)" as UI << (B,#F59E0B) Boundary >>
+participant "Bộ điều khiển Xác thực\n(AuthController / auth.py)" as AuthCtrl << (C,#818CF8) Controller >>
+participant "Mô-đun Bảo mật\n(Security / Bcrypt & JWT)" as Sec << (S,#10B981) Service >>
+database "Cơ sở dữ liệu\n(PostgreSQL DB)" as DB
 
 User -> UI : Nhập email, password & bấm "Đăng nhập"
-UI -> AuthCtrl : POST /api/auth/login {email, password}
-AuthCtrl -> DB : SELECT * FROM users WHERE email = :email
-DB --> AuthCtrl : Trả về User Entity (password_hash, role)
+activate UI
 
-alt Người dùng không tồn tại
-    AuthCtrl --> UI : HTTP 401 Unauthorized {"message": "Email không tồn tại"}
-    UI --> User : Hiển thị thông báo lỗi
+UI -> AuthCtrl : POST /api/v1/auth/login\n{username/email, password}
+activate AuthCtrl
+
+AuthCtrl -> DB : SELECT * FROM users WHERE email = :email
+activate DB
+DB --> AuthCtrl : Trả về thông tin User (password_hash, role, ...)
+deactivate DB
+
+alt Người dùng không tồn tại (User not found)
+    AuthCtrl --> UI : HTTP 401 Unauthorized\n{"detail": "Mật khẩu hoặc Email không chính xác"}
+    UI --> User : Hiển thị Toast thông báo lỗi đăng nhập
 else Người dùng tồn tại
-    AuthCtrl -> Sec : bcrypt.checkpw(password, password_hash)
+    AuthCtrl -> Sec : verify_password(password, user.password_hash)
+    activate Sec
     alt Sai mật khẩu
-        Sec --> AuthCtrl : False
-        AuthCtrl --> UI : HTTP 401 Unauthorized {"message": "Mật khẩu không đúng"}
-        UI --> User : Hiển thị thông báo lỗi
+        Sec --> AuthCtrl : False (Mật khẩu không khớp)
+        AuthCtrl --> UI : HTTP 401 Unauthorized\n{"detail": "Mật khẩu hoặc Email không chính xác"}
+        UI --> User : Hiển thị Toast thông báo lỗi đăng nhập
     else Đúng mật khẩu
-        Sec --> AuthCtrl : True
-        AuthCtrl -> Sec : create_access_token(user_id, role, expires_in=7d)
-        Sec --> AuthCtrl : JWT Token String
-        AuthCtrl --> UI : HTTP 200 OK {token, user: {id, full_name, role}}
-        UI -> UI : Lưu token vào localStorage & AuthContext
-        UI --> User : Chuyển hướng đến Dashboard tương ứng vai trò
+        Sec --> AuthCtrl : True (Mật khẩu hợp lệ)
+        AuthCtrl -> Sec : create_access_token(subject=user.id, expires_delta=7d)
+        Sec --> AuthCtrl : JWT Access Token String
+        deactivate Sec
+        AuthCtrl --> UI : HTTP 200 OK\n{"access_token": token, "token_type": "bearer", "user": {...}}
+        deactivate AuthCtrl
+        UI -> UI : Lưu token vào localStorage & cập nhật AuthContext
+        UI --> User : Điều hướng đến Dashboard theo vai trò (ADMIN/LEADER/MEMBER)
+        deactivate UI
     end
 end
 @enduml

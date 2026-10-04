@@ -3,6 +3,9 @@
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
 
 left to right direction
 actor "Thành viên (Member)" as Member
@@ -18,10 +21,10 @@ rectangle "Phân hệ 2: Quản lý Thành viên & Ban Chuyên môn" {
 }
 
 Member --> UC02
-UC02 ..> UC02_Skill : <<include>>
-UC02 ..> UC02_Slot : <<include>>
+UC02 <.. UC02_Skill : <<extend>>
+UC02 <.. UC02_Slot : <<extend>>
 
 Admin --> UC11
-UC11 ..> UC11_Dept : <<include>>
-UC11 ..> UC11_Assign : <<include>>
+UC11 <.. UC11_Dept : <<extend>>
+UC11 <.. UC11_Assign : <<extend>>
 @enduml

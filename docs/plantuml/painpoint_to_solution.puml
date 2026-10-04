@@ -2,30 +2,63 @@
 !theme plain
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam roundcorner 8
+skinparam roundcorner 10
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
 
-rectangle "Khảo sát Thực trạng (Pain Points - Tuần 1)" as PainPoints #FEE2E2 {
-    rectangle "Phân công thủ công, sai kỹ năng & trùng lịch" as P1
-    rectangle "Điểm danh giấy chậm, dễ gian lận" as P2
-    rectangle "Quản lý task phân tán qua chat, trễ hạn" as P3
-    rectangle "Viết bài truyền thông tốn thời gian" as P4
-    rectangle "Tóm tắt báo cáo & phản hồi rời rạc" as P5
-    rectangle "Đánh giá đóng góp cảm tính" as P6
+skinparam rectangle {
+    BorderThickness 1.5
 }
 
-rectangle "Giải pháp Chức năng (SRS Requirements - Tuần 2)" as Solutions #DCFCE7 {
-    rectangle "FR-SYS-02 Skill Matrix + FR-AI-03 AI Matchmaking" as S1
-    rectangle "FR-SYS-04 Dynamic QR Check-in System" as S2
-    rectangle "FR-SYS-05 Kanban Task Board + RBAC" as S3
-    rectangle "FR-AI-01 AI Event Announcement Generator" as S4
-    rectangle "FR-AI-02 AI Activity & Feedback Summarizer" as S5
-    rectangle "FR-SYS-06 Contribution Score & Leaderboard" as S6
+header <font color=#64748B size=11>Đề tài 28: Hệ thống quản lý câu lạc bộ sinh viên có tích hợp AI</font>
+title <size:16><b>MA TRẬN ÁNH XẠ NHU CẦU NGƯỜI DÙNG & ĐỀ XUẤT GIẢI PHÁP CHỨC NĂNG</b></size>\n<size:12><font color=#475569>Từ 06 Điểm đau (Pain Points) Khảo sát Tuần 1 sang 06 Gói Giải pháp Kỹ thuật (SRS) Tuần 2</font></size>\n
+
+rectangle "<b>KHẢO SÁT HIỆN TRẠNG & ĐIỂM ĐAU (PAIN POINTS - TUẦN 1)</b>" as PainPoints #FEF2F2 {
+    rectangle "<b>[Điểm đau 01] Phân công việc thủ công, thiếu thông tin</b>\nTrưởng ban mất 2-3h/sự kiện hỏi lịch; thành viên bị giao việc\ntrùng lịch học hoặc không đúng sở trường kỹ năng." as P1 #FEE2E2
+    
+    rectangle "<b>[Điểm đau 02] Điểm danh giấy chậm chạp, dễ gian lận</b>\nÙn tắc 15-20 phút đầu sự kiện chờ ký tên danh sách giấy,\ndễ xảy ra tình trạng ký tên hộ hoặc thất lạc biên bản." as P2 #FEE2E2
+    
+    rectangle "<b>[Điểm đau 03] Theo dõi tiến độ phân tán qua Chat/Zalo</b>\nTin nhắn giao việc bị trôi; Ban chủ nhiệm không nắm được\ntiến độ thực tế, đánh giá cảm tính và thường xuyên trễ hạn." as P3 #FEE2E2
+    
+    rectangle "<b>[Điểm đau 04] Viết bài truyền thông tốn thời gian</b>\nBan Truyền thông mất nhiều giờ soạn nội dung; câu từ đơn điệu,\nthiếu sáng tạo, khó thu hút sự quan tâm của sinh viên." as P4 #FEE2E2
+    
+    rectangle "<b>[Điểm đau 05] Tổng hợp báo cáo & phản hồi rời rạc</b>\nBiên bản họp dài dòng, các phản hồi sau sự kiện bị phân tán,\nkhông đúc kết được bài học kinh nghiệm cho lần sau." as P5 #FEE2E2
+    
+    rectangle "<b>[Điểm đau 06] Đánh giá mức độ đóng góp cảm tính</b>\nThiếu số liệu đo lường cụ thể về độ tích cực của thành viên,\ngây mất động lực cống hiến cho các nhân tố nhiệt huyết." as P6 #FEE2E2
+
+    P1 -[hidden]down-> P2
+    P2 -[hidden]down-> P3
+    P3 -[hidden]down-> P4
+    P4 -[hidden]down-> P5
+    P5 -[hidden]down-> P6
 }
 
-P1 --> S1
-P2 --> S2
-P3 --> S3
-P4 --> S4
-P5 --> S5
-P6 --> S6
+rectangle "<b>GIẢI PHÁP CHỨC NĂNG & TÍCH HỢP AI (SRS - TUẦN 2)</b>" as Solutions #F0FDF4 {
+    rectangle "<b>[Giải pháp 01] Skill Matrix & AI Smart Matchmaking</b>\nFR-SYS-02 (Hồ sơ Ma trận Kỹ năng & Lịch rảnh cá nhân) kết hợp\nFR-AI-03 (Thuật toán gợi ý ghép cặp tự động Match Score > 85%)." as S1 #DCFCE7
+    
+    rectangle "<b>[Giải pháp 02] Dynamic QR Check-in System Realtime</b>\nFR-SYS-04 (Hệ thống sinh mã Dynamic QR độc bản UUID v4),\ncho phép sinh viên quét mã bằng Mobile Camera trong <= 3 giây." as S2 #DCFCE7
+    
+    rectangle "<b>[Giải pháp 03] Kanban Board with RBAC Enforcement</b>\nFR-SYS-05 (Bảng Kanban 3 cột To-Do, In-Progress, Done),\nkiểm soát chặt chỉ người được phân công mới được đổi trạng thái." as S3 #DCFCE7
+    
+    rectangle "<b>[Giải pháp 04] AI Event Announcement Generator</b>\nFR-AI-01 (Công cụ AI sinh bài đăng thông báo đa phong cách\nMulti-tone Hào hứng/Trang trọng, tự chèn emoji sinh động < 3s)." as S4 #DCFCE7
+    
+    rectangle "<b>[Giải pháp 05] AI Activity & Feedback Summarizer</b>\nFR-AI-02 (Công cụ AI tự động tóm tắt biên bản họp thành báo cáo\nchuẩn 3 phần: Kết quả đạt được, Tồn tại và Đề xuất cải tiến)." as S5 #DCFCE7
+    
+    rectangle "<b>[Giải pháp 06] Contribution Score & Leaderboard</b>\nFR-SYS-06 (Công thức tính điểm đóng góp tự động minh bạch),\ncập nhật Bảng xếp hạng vinh danh thành viên theo thời gian thực." as S6 #DCFCE7
+
+    S1 -[hidden]down-> S2
+    S2 -[hidden]down-> S3
+    S3 -[hidden]down-> S4
+    S4 -[hidden]down-> S5
+    S5 -[hidden]down-> S6
+}
+
+P1 -[#2563EB,bold]-> S1 : Giải quyết
+P2 -[#2563EB,bold]-> S2 : Giải quyết
+P3 -[#2563EB,bold]-> S3 : Giải quyết
+P4 -[#2563EB,bold]-> S4 : Giải quyết
+P5 -[#2563EB,bold]-> S5 : Giải quyết
+P6 -[#2563EB,bold]-> S6 : Giải quyết
+
 @enduml

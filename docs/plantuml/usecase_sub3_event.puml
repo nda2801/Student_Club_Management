@@ -3,6 +3,9 @@
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
 
 left to right direction
 actor "Trưởng ban / BCN" as Leader
@@ -18,10 +21,10 @@ rectangle "Phân hệ 3: Quản lý Sự kiện & Điểm danh QR" {
 }
 
 Leader --> UC04
-UC04 ..> UC04_Create : <<include>>
-UC04 ..> UC04_QR : <<include>>
+UC04 <.. UC04_Create : <<extend>>
+UC04 <.. UC04_QR : <<extend>>
 
 Member --> UC09
-UC09 ..> UC09_Verify : <<include>>
-UC09 ..> UC09_Unique : <<include>>
+UC09 <.. UC09_Verify : <<extend>>
+UC09 <.. UC09_Unique : <<extend>>
 @enduml

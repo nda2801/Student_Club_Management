@@ -1,9 +1,10 @@
 @startuml sequence_qr_checkin
-!theme plain
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
 
 skinparam sequence {
     ArrowColor #2563EB
@@ -13,53 +14,67 @@ skinparam sequence {
     ParticipantBorderColor #3B82F6
     ParticipantBackgroundColor #EFF6FF
     ParticipantFontColor #0F172A
+    DatabaseBorderColor #475569
+    DatabaseBackgroundColor #F8FAFC
 }
 
 title **BIỂU ĐỒ TUẦN TỰ: QUÉT MÃ QR ĐIỂM DANH SỰ KIỆN REALTIME (UC09)**
 
 autonumber
 actor "Thành viên (Member)\nMobile Browser" as Member
-participant "React Frontend\n(Vite Check-in UI)" as UI
-participant "Flask Attendance API\n(Controller)" as Controller
-participant "PostgreSQL DB\n(Docker Container)" as DB
-actor "Trưởng ban (Leader)\nWeb Dashboard" as Leader
+participant "Giao diện Điểm danh\n(QRScannerModal / Activities.jsx)" as UI << (B,#F59E0B) Boundary >>
+participant "Bộ điều khiển Hoạt động\n(ActivitiesController / activities.py)" as ActCtrl << (C,#818CF8) Controller >>
+database "Cơ sở dữ liệu\n(PostgreSQL DB)" as DB
+participant "Giao diện Ban Chủ nhiệm\n(ActivityDetailView / Leaderboard)" as LeaderUI << (B,#F59E0B) Boundary >>
+actor "Trưởng ban / Admin\n(Organizer / Leader)" as Leader
 
-Member -> UI : Mở Camera / Web Scanner quét mã QR
-UI -> Controller : POST /api/attendance/checkin\n(Header: Bearer JWT, Body: {qr_token})
+Member -> UI : Mở Camera / Web Scanner quét mã Dynamic QR
+activate UI
 
-activate Controller
-Controller -> Controller : Xác thực JWT (@jwt_required)
+UI -> ActCtrl : POST /api/v1/activities/checkin\n(Header: Bearer JWT, Body: {activity_id, qr_code_hash, user_lat, user_lng})
+activate ActCtrl
 
-Controller -> DB : SELECT * FROM activities WHERE qr_code_token = :qr_token
+ActCtrl -> ActCtrl : Xác thực JWT (@jwt_required) & lấy current_user
+
+ActCtrl -> DB : SELECT * FROM activities WHERE id = :activity_id
 activate DB
-DB --> Controller : Trả về Activity record (status, time range)
+DB --> ActCtrl : Trả về Activity record (status, time range, lat, lng, radius)
 deactivate DB
 
-alt Mã QR không khớp hoặc sự kiện đã đóng
-    Controller --> UI : HTTP 400 Bad Request\n{"message": "Mã QR không hợp lệ hoặc sự kiện đã đóng"}
-    UI --> Member : Hiển thị Toast thông báo lỗi đỏ
-else Sự kiện đang diễn ra hợp lệ
-    Controller -> DB : SELECT * FROM attendances\nWHERE activity_id = :act_id AND user_id = :uid
+alt Sự kiện không tồn tại hoặc đã đóng điểm danh
+    ActCtrl --> UI : HTTP 400 Bad Request\n{"detail": "Sự kiện không hợp lệ hoặc đã đóng điểm danh"}
+    UI --> Member : Hiển thị Toast cảnh báo lỗi đỏ
+else Sự kiện đang mở điểm danh hợp lệ
+    ActCtrl -> DB : SELECT * FROM attendances\nWHERE activity_id = :act_id AND user_id = :uid
     activate DB
-    DB --> Controller : Kiểm tra bản ghi điểm danh
+    DB --> ActCtrl : Kiểm tra bản ghi điểm danh hiện có
     deactivate DB
     
-    alt Đã điểm danh trước đó
-        Controller --> UI : HTTP 409 Conflict\n{"message": "Bạn đã điểm danh sự kiện này rồi"}
+    alt Đã điểm danh trước đó (Trùng lặp)
+        ActCtrl --> UI : HTTP 400 Bad Request\n{"detail": "Bạn (hoặc thành viên này) đã được điểm danh rồi!"}
         UI --> Member : Hiển thị cảnh báo điểm danh trùng lặp
-    else Chưa điểm danh
-        Controller -> DB : INSERT INTO attendances\n(activity_id, user_id, checkin_time, method)
-        activate DB
-        Controller -> DB : UPDATE users SET contribution_score = contribution_score + 10\nWHERE id = :uid
-        DB --> Controller : Commit Transaction thành công
-        deactivate DB
-        
-        Controller --> UI : HTTP 200 OK\n{"message": "Điểm danh thành công", "points_earned": 10}
-        UI --> Member : Hiệu ứng Checkmark xanh & Thông báo +10 điểm
-        
-        Controller -->> Leader : WebSocket / Polling Refresh Leaderboard
+    else Chưa điểm danh & Kiểm tra GPS Geofence
+        ActCtrl -> ActCtrl : haversine_distance(user_coords, act_coords) <= allowed_radius
+        alt Ngoài phạm vi GPS cho phép
+            ActCtrl --> UI : HTTP 400 Bad Request\n{"detail": "Vị trí điểm danh ngoài phạm vi cho phép"}
+            UI --> Member : Cảnh báo yêu cầu đến gần hội trường sự kiện
+        else Hợp lệ toàn diện (Điểm danh thành công)
+            ActCtrl -> DB : INSERT INTO attendances (activity_id, user_id, checkin_time, status='PRESENT')
+            activate DB
+            ActCtrl -> DB : UPDATE users SET contribution_score = contribution_score + 10 WHERE id = :uid
+            DB --> ActCtrl : Transaction Commit thành công
+            deactivate DB
+            
+            ActCtrl --> UI : HTTP 201 Created\n{"id": att_id, "status": "PRESENT", "user_name": full_name}
+            deactivate ActCtrl
+            UI --> Member : Hiệu ứng Checkmark xanh & Thông báo "+10 Điểm cống hiến"
+            deactivate UI
+            
+            ActCtrl -->> LeaderUI : WebSocket / Polling Broadcast sự kiện check-in realtime
+            activate LeaderUI
+            LeaderUI --> Leader : Cập nhật danh sách điểm danh & Tăng sĩ số có mặt tức thì
+            deactivate LeaderUI
+        end
     end
 end
-deactivate Controller
-
 @enduml

@@ -3,16 +3,19 @@
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
 
 left to right direction
 actor "Trưởng ban / BCN" as Leader
 actor "Người dùng" as User
-actor "AI Service (Gemini/Fallback)" as AI <<System>>
+actor "Dịch vụ Hệ thống Phụ trợ" as ExternalService <<System>>
 
-rectangle "Phân hệ 5: Trợ lý AI & Báo cáo Thống kê" {
-    usecase "UC06: AI Gợi ý Phân công Thông minh" as UC06
-    usecase "UC07: AI Sinh Bài đăng Truyền thông" as UC07
-    usecase "UC08: AI Tóm tắt Kết quả Hoạt động" as UC08
+rectangle "Phân hệ 5: Báo cáo Thống kê" {
+    usecase "UC06: Gợi ý Phân công Thông minh" as UC06
+    usecase "UC07: Sinh Bài đăng Truyền thông" as UC07
+    usecase "UC08: Tóm tắt Kết quả Hoạt động" as UC08
     usecase "UC03: Tra cứu Lịch sử & Leaderboard" as UC03
     usecase "Tính điểm Contribution Score" as UC_Score
 }
@@ -22,9 +25,9 @@ Leader --> UC07
 Leader --> UC08
 User --> UC03
 
-AI <-- UC06
-AI <-- UC07
-AI <-- UC08
+ExternalService <-- UC06
+ExternalService <-- UC07
+ExternalService <-- UC08
 
-UC03 ..> UC_Score : <<include>>
+UC03 <.. UC_Score : <<extend>>
 @enduml

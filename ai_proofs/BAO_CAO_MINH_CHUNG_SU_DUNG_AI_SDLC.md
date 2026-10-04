@@ -16,13 +16,19 @@
 ## 🚀 2. MINH CHỨNG SỬ DỤNG AI THEO TỪNG GIAI ĐOẠN SDLC
 
 ### 🔹 Giai đoạn 1 (KT1): AI trong Khảo sát & Thiết kế Yêu cầu (Requirements & Design)
-- **Công cụ / Agent sử dụng**: BMAD BA Agent (Mary) & System Architect Agent (Winston).
+- **Công cụ / Agent sử dụng**: Google Gemini 1.5 Pro, OpenAI GPT-4o, BMAD BA Agent (Mary) & System Architect Agent (Winston).
 - **Nhiệm vụ AI thực hiện**: 
-  - Phân tích đề bài 28, phân tích điểm đau (Pain points) của Ban Chủ nhiệm CLB.
-  - Gợi ý ma trận Use Cases và thiết kế Sơ đồ CSDL ERD 7 bảng chuẩn 3NF.
+  - Khảo sát hiện trạng, bóc tách 06 Điểm đau (Pain Points) từ 120 phiếu khảo sát sinh viên.
+  - Phân rã cấu trúc chức năng (WBS) thành 05 Phân hệ cốt lõi.
+  - Đặc tả chuẩn 06 Yêu cầu Quản lý (FR-SYS) và 03 Yêu cầu Trí tuệ Nhân tạo (FR-AI).
+  - Chuẩn hóa 14 Yêu cầu Phi chức năng theo chuẩn ISO/IEC 25010 kèm Acceptance Criteria & Test Methods.
+  - Mô hình hóa 12 Use Cases và viết 03 Use Case Specifications chi tiết (UC04, UC05, UC06).
+  - Lập Ma trận Phân loại MoSCoW và Ma trận Truy vết Yêu cầu 2 chiều (RTM).
+  - Tự động sinh mã nguồn sơ đồ PlantUML cho 19 biểu đồ UML của hệ thống.
 - **Minh chứng cụ thể**:
-  - File Prompt & Phân tích Use Case: [`ai_proofs/KT1_Requirements_Design_Prompts.md`](file:///D:/DTC245200328/Nam3/Ki1/UngDungAI/Student_Club_Management/ai_proofs/KT1_Requirements_Design_Prompts.md)
-  - File Báo cáo SRS & ERD đã tạo: [`03_requirements-specification.docx`](file:///D:/DTC245200328/Nam3/Ki1/UngDungAI/Student_Club_Management/docs/03_GenAI_SoftwareDevelopment_requirements-specification.docx), [`06_screenflow_db.docx`](file:///D:/DTC245200328/Nam3/Ki1/UngDungAI/Student_Club_Management/docs/06_GenAI_SoftwareDevelopment_screenflow_db.docx).
+  - **Báo cáo Chuyên sâu Minh chứng AI Phân tích Yêu cầu**: [`ai_proofs/MINH_CHUNG_AI_PHAN_TICH_YEU_CAU.md`](file:///D:/DTC245200328/Nam3/Ki1/UngDungAI/Student_Club_Management/ai_proofs/MINH_CHUNG_AI_PHAN_TICH_YEU_CAU.md) | File Word: [`docs/MINH_CHUNG_AI_PHAN_TICH_YEU_CAU.docx`](file:///D:/DTC245200328/Nam3/Ki1/UngDungAI/Student_Club_Management/docs/MINH_CHUNG_AI_PHAN_TICH_YEU_CAU.docx).
+  - File Nhật ký Prompt: [`ai_proofs/KT1_Requirements_Design_Prompts.md`](file:///D:/DTC245200328/Nam3/Ki1/UngDungAI/Student_Club_Management/ai_proofs/KT1_Requirements_Design_Prompts.md).
+  - Các tài liệu SRS & Thiết kế OOD được sinh ra: [`03_requirements-specification.docx`](file:///D:/DTC245200328/Nam3/Ki1/UngDungAI/Student_Club_Management/docs/03_GenAI_SoftwareDevelopment_requirements-specification.docx), [`08_KhaoSat_PhanTich_YeuCau_ChucNang_PhiChucNang (final).docx`](file:///D:/DTC245200328/Nam3/Ki1/UngDungAI/Student_Club_Management/docs/08_KhaoSat_PhanTich_YeuCau_ChucNang_PhiChucNang%20(final).docx).
 
 ### 🔹 Giai đoạn 2 (KT2): AI trong Lập trình & Sinh Mã nguồn (Code Generation)
 - **Công cụ / Agent sử dụng**: BMAD Senior Dev Agent (Amelia).

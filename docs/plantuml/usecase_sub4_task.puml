@@ -3,6 +3,9 @@
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
 
 left to right direction
 actor "Trưởng ban / Admin" as Leader
@@ -18,10 +21,10 @@ rectangle "Phân hệ 4: Quản lý Nhiệm vụ & Kanban Board" {
 }
 
 Leader --> UC05
-UC05 ..> UC05_Create : <<include>>
-UC05 ..> UC05_Assign : <<include>>
-UC05 ..> UC05_Move : <<include>>
+UC05 <.. UC05_Create : <<extend>>
+UC05 <.. UC05_Assign : <<extend>>
+UC05 <.. UC05_Move : <<extend>>
 
 Member --> UC10
-UC10 ..> UC10_RBAC : <<include>>
+UC10 <.. UC10_RBAC : <<extend>>
 @enduml

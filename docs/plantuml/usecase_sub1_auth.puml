@@ -3,6 +3,9 @@
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
 
 left to right direction
 actor "Người dùng" as User
@@ -11,17 +14,17 @@ actor "Ban Chủ nhiệm (Admin)" as Admin
 rectangle "Phân hệ 1: Xác thực & Phân quyền (Auth & RBAC)" {
     usecase "UC01: Đăng nhập Hệ thống" as UC01
     usecase "Xác thực Email & Bcrypt Password" as UC01_P
-    usecase "Cấp Access Token JWT 7 ngày" as UC01_JWT
+    usecase "Cấp Access Token JWT 24h" as UC01_JWT
     usecase "UC12: Quản trị Tài khoản & Phân quyền" as UC12
     usecase "Phân bổ Vai trò Admin/Leader/Member" as UC12_Role
     usecase "Khóa / Mở khóa Tài khoản" as UC12_Lock
 }
 
 User --> UC01
-UC01 ..> UC01_P : <<include>>
-UC01 ..> UC01_JWT : <<include>>
+UC01 <.. UC01_P : <<extend>>
+UC01 <.. UC01_JWT : <<extend>>
 
 Admin --> UC12
-UC12 ..> UC12_Role : <<include>>
-UC12 ..> UC12_Lock : <<include>>
+UC12 <.. UC12_Role : <<extend>>
+UC12 <.. UC12_Lock : <<extend>>
 @enduml

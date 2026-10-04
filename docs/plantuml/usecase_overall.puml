@@ -5,6 +5,7 @@ skinparam shadowing false
 skinparam roundcorner 10
 skinparam defaultFontName "Segoe UI"
 skinparam defaultFontSize 12
+skinparam dpi 200
 
 skinparam package {
     BackgroundColor #F8FAFC
@@ -27,7 +28,7 @@ skinparam actor {
 }
 
 left to right direction
-title **HỆ THỐNG QUẢN LÝ CÂU LẠC BỘ SINH VIÊN CÓ TÍCH HỢP AI (ĐỀ TÀI 28)\nBIỂU ĐỒ USE CASE TỔNG THỂ HỆ THỐNG**
+title **HỆ THỐNG QUẢN LÝ CÂU LẠC BỘ SINH VIÊN (ĐỀ TÀI 28)\nBIỂU ĐỒ USE CASE TỔNG THỂ HỆ THỐNG**
 
 ' ==========================================
 ' ACTORS
@@ -36,7 +37,7 @@ actor "Người dùng chung\n(Authenticated User)" as User <<Abstract>>
 actor "Ban Chủ nhiệm\n(Admin)" as Admin
 actor "Trưởng ban\n(Leader)" as Leader
 actor "Thành viên\n(Member)" as Member
-actor "Dịch vụ AI Ngoài\n(Gemini / OpenAI API)" as AIService <<System>>
+actor "Dịch vụ Hỗ trợ Ngoại vi\n(Gemini / OpenAI API)" as AIService <<System>>
 
 ' Actor Inheritance
 Admin -up-|> User
@@ -46,12 +47,12 @@ Member -up-|> User
 ' ==========================================
 ' SUBSYSTEM PACKAGES & USE CASES
 ' ==========================================
-rectangle "Hệ Thống Quản Lý Câu Lạc Bộ Sinh Viên Tích Hợp AI" {
+rectangle "Hệ Thống Quản Lý Câu Lạc Bộ Sinh Viên" {
 
     package "Phân hệ 1: Xác thực & Phân quyền (Auth & RBAC)" {
         usecase "UC01: Đăng nhập & Xác thực JWT" as UC01
         usecase "UC12: Quản trị & Phân quyền Tài khoản" as UC12
-        usecase "Xác thực JWT & Kiểm tra Phân quyền" as UC_Auth <<Include>>
+        usecase "Xác thực JWT & Kiểm tra Phân quyền" as UC_Auth <<Extend>>
     }
 
     package "Phân hệ 2: Quản lý Thành viên & Ban Chuyên môn" {
@@ -62,22 +63,22 @@ rectangle "Hệ Thống Quản Lý Câu Lạc Bộ Sinh Viên Tích Hợp AI" {
     package "Phân hệ 3: Quản lý Sự kiện & Điểm danh QR" {
         usecase "UC04: Quản lý Sự kiện & Sinh mã QR" as UC04
         usecase "UC09: Quét mã QR Điểm danh" as UC09
-        usecase "Sinh chuỗi QR độc bản (UUID)" as UC_GenQR <<Include>>
+        usecase "Sinh chuỗi QR độc bản (UUID)" as UC_GenQR <<Extend>>
     }
 
     package "Phân hệ 4: Quản lý Nhiệm vụ & Kanban Board" {
         usecase "UC05: Quản lý Nhiệm vụ & Kanban Board" as UC05
         usecase "UC10: Cập nhật Tiến độ Task của mình" as UC10
-        usecase "Kiểm soát RBAC sửa Task (Chặn 403)" as UC_RBAC <<Include>>
+        usecase "Kiểm soát RBAC sửa Task (Chặn 403)" as UC_RBAC <<Extend>>
     }
 
-    package "Phân hệ 5: Trợ lý AI & Báo cáo Thống kê" {
-        usecase "UC06: AI Gợi ý Phân công Nhiệm vụ" as UC06
-        usecase "UC07: AI Sinh Bài đăng Thông báo" as UC07
-        usecase "UC08: AI Tóm tắt Kết quả Hoạt động" as UC08
+    package "Phân hệ 5: Báo cáo Thống kê" {
+        usecase "UC06: Gợi ý Phân công Nhiệm vụ" as UC06
+        usecase "UC07: Sinh Bài đăng Thông báo" as UC07
+        usecase "UC08: Tóm tắt Kết quả Hoạt động" as UC08
         usecase "UC03: Tra cứu Lịch sử & Bảng xếp hạng" as UC03
-        usecase "So khớp Kỹ năng & Fallback Rule" as UC_Match <<Include>>
-        usecase "Tính điểm Contribution Score" as UC_Score <<Include>>
+        usecase "So khớp Kỹ năng & Fallback Rule" as UC_Match <<Extend>>
+        usecase "Tính điểm Contribution Score" as UC_Score <<Extend>>
     }
 }
 
@@ -105,19 +106,18 @@ Leader --> UC08
 Admin --> UC11
 Admin --> UC12
 
-' Include Relationships
-UC04 ..> UC_GenQR : <<include>>
-UC09 ..> UC_Auth : <<include>>
-UC10 ..> UC_RBAC : <<include>>
-UC06 ..> UC_Match : <<include>>
-UC03 ..> UC_Score : <<include>>
+' Extend Relationships (All UC relationships are <<extend>>)
+UC04 <.. UC_GenQR : <<extend>>
+UC09 <.. UC_Auth : <<extend>>
+UC10 <.. UC_RBAC : <<extend>>
+UC06 <.. UC_Match : <<extend>>
+UC03 <.. UC_Score : <<extend>>
 
-' Extend Relationships
 UC05 <.. UC06 : <<extend>>
 UC04 <.. UC07 : <<extend>>
 UC04 <.. UC08 : <<extend>>
 
-' AI Service interactions
+' External Service interactions
 AIService <-- UC06
 AIService <-- UC07
 AIService <-- UC08

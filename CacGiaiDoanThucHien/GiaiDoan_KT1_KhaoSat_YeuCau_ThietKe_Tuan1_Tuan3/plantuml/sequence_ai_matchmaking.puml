@@ -1,9 +1,10 @@
 @startuml sequence_ai_matchmaking
-!theme plain
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam dpi 200
 
 skinparam sequence {
     ArrowColor #2563EB
@@ -13,75 +14,89 @@ skinparam sequence {
     ParticipantBorderColor #3B82F6
     ParticipantBackgroundColor #EFF6FF
     ParticipantFontColor #0F172A
+    DatabaseBorderColor #475569
+    DatabaseBackgroundColor #F8FAFC
 }
 
 title **BIỂU ĐỒ TUẦN TỰ: AI GỢI Ý PHÂN CÔNG NHIỆM VỤ VỚI DUAL-ENGINE FALLBACK (UC06)**
 
 autonumber
 actor "Trưởng ban (Leader)" as Leader
-participant "React Task Kanban\n(Frontend)" as UI
-participant "Flask Task Controller\n(Backend API)" as Controller
-participant "AIService Engine\n(Service Layer)" as AIService
-participant "Google Gemini API\n(Cloud LLM)" as Gemini
-participant "Local Rule Engine\n(Fallback Matcher)" as Fallback
-participant "PostgreSQL DB\n(Database)" as DB
+participant "Giao diện Bảng việc\n(TaskKanbanView / AIHub.jsx)" as UI << (B,#F59E0B) Boundary >>
+participant "Bộ điều khiển AI\n(AIController / ai.py)" as AICtrl << (C,#818CF8) Controller >>
+participant "Bộ điều khiển Nhiệm vụ\n(TasksController / tasks.py)" as TaskCtrl << (C,#818CF8) Controller >>
+participant "Dịch vụ AI Thông minh\n(AIService Engine)" as AIService << (S,#10B981) Service >>
+participant "Google Gemini API\n(Cloud LLM)" as Gemini << (E,#06B6D4) External AI >>
+participant "Bộ khớp Quy tắc Cục bộ\n(Local Rule Matcher)" as Fallback << (F,#64748B) Fallback Engine >>
+database "Cơ sở dữ liệu\n(PostgreSQL DB)" as DB
 
-Leader -> UI : Bấm nút "AI Gợi ý Phân công" (Activity ID)
-UI -> Controller : POST /api/ai/suggest-assignments {activity_id}
+== Giai đoạn 1: AI Phân tích & Gợi ý Phân công (Dual-Engine Fallback) ==
 
-activate Controller
-Controller -> Controller : Kiểm tra quyền Leader/Admin (@roles_required)
-Controller -> DB : Truy vấn Tasks chưa gán & Members (Skills, Free Slots)
+Leader -> UI : Chọn các Task cần phân công & nhấn "AI Gợi ý Phân công"
+activate UI
+
+UI -> AICtrl : POST /api/v1/ai/suggest-assignments\n{task_ids: [1, 2, 3]}
+activate AICtrl
+
+AICtrl -> AICtrl : Kiểm tra quyền Leader/Admin (@jwt_required)
+AICtrl -> DB : SELECT Tasks theo task_ids & SELECT Users (skills, free_slots)
 activate DB
-DB --> Controller : Trả về Task List & Member List
+DB --> AICtrl : Trả về Task List & Member List
 deactivate DB
 
-Controller -> AIService : match_tasks_to_members(tasks, members)
+AICtrl -> AIService : suggest_assignments(tasks_data, members_data)
 activate AIService
-AIService -> AIService : Chuẩn bị Prompt & Context JSON
+AIService -> AIService : Xây dựng Prompt & chuẩn bị Context JSON
 
 alt Kết nối Internet tốt & API Key hợp lệ
-    AIService -> Gemini : POST /v1beta/models/gemini-pro:generateContent (JSON Payload)
+    AIService -> Gemini : POST /v1beta/models/gemini-pro:generateContent (Prompt JSON)
     activate Gemini
     alt Gemini phản hồi thành công (< 5s)
-        Gemini --> AIService : Raw JSON String
+        Gemini --> AIService : Raw JSON kết quả phân công
         deactivate Gemini
-        AIService -> AIService : Parse & Validate bằng Pydantic Schema
-    else Gemini Timeout / Lỗi Quota 429
-        AIService -> Fallback : execute_rule_matching(tasks, members)
+        AIService -> AIService : Parse JSON & Validate Pydantic Schema
+    else Gemini Timeout (> 5s) / Lỗi Quota 429
+        AIService -> Fallback : Fallback sang execute_rule_matching(tasks, members)
         activate Fallback
-        Fallback --> AIService : Heuristic Match Results (< 100ms)
+        Fallback --> AIService : Heuristic Match Suggestions (< 100ms)
         deactivate Fallback
     end
 else Mất mạng Internet / Chế độ Offline
-    AIService -> Fallback : execute_rule_matching(tasks, members)
+    AIService -> Fallback : Chuyển mạch tức thì execute_rule_matching(tasks, members)
     activate Fallback
-    Fallback --> AIService : Heuristic Match Results (< 100ms)
+    Fallback --> AIService : Heuristic Match Suggestions (< 100ms)
     deactivate Fallback
 end
 
-AIService -> DB : INSERT INTO ai_logs (feature, prompt, response, engine, time_ms)
+AIService -> DB : INSERT INTO ai_logs (prompt_type='RECOMMEND', input_data, output_result)
 activate DB
-DB --> AIService : Log saved
+DB --> AIService : Log saved OK
 deactivate DB
 
-AIService --> Controller : Validated List[AssignmentSuggestion]
+AIService --> AICtrl : Validated List[AssignmentSuggestion]
 deactivate AIService
 
-Controller --> UI : HTTP 200 OK {suggestions: [{task_id, user_id, match_score, reason}, ...]}
-deactivate Controller
+AICtrl --> UI : HTTP 200 OK\n{suggestions: [{task_id, user_id, match_score, reason}, ...]}
+deactivate AICtrl
 
-UI --> Leader : Hiển thị Bảng ghép cặp đề xuất kèm Match Score %
+UI --> Leader : Hiển thị Modal/Drawer đề xuất kèm Match Score % và Lý do
 
-Leader -> UI : Xem xét, tinh chỉnh nhân sự & bấm "Áp dụng Phân công"
-UI -> Controller : POST /api/tasks/batch-assign {assignments}
-activate Controller
-Controller -> DB : UPDATE tasks & INSERT INTO task_assignments
+== Giai đoạn 2: Trưởng ban Phê duyệt & Áp dụng Phân công ==
+
+Leader -> UI : Xem xét, tinh chỉnh nhân sự & nhấn "Áp dụng Phân công"
+UI -> TaskCtrl : POST /api/v1/tasks/assign\n{task_id, user_id, ai_suggested: true, match_score}
+activate TaskCtrl
+
+TaskCtrl -> TaskCtrl : Kiểm tra quyền Leader/Admin (@roles_required)
+TaskCtrl -> DB : INSERT INTO task_assignments & UPDATE tasks SET status='IN_PROGRESS'
 activate DB
-DB --> Controller : Commit OK
+DB --> TaskCtrl : Commit Transaction thành công
 deactivate DB
-Controller --> UI : HTTP 200 OK {"message": "Đã phân công thành công"}
-deactivate Controller
-UI --> Leader : Cập nhật Kanban Board tức thì
+
+TaskCtrl --> UI : HTTP 200 OK {"message": "Đã phân công thành công"}
+deactivate TaskCtrl
+
+UI --> Leader : Cập nhật Kanban Board tức thì & hiển thị Avatar nhân sự
+deactivate UI
 
 @enduml

@@ -4,10 +4,10 @@ skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 6
 
-* **HỆ THỐNG QUẢN LÝ CLB SINH VIÊN TÍCH HỢP AI (ĐỀ TÀI 28)**
+* **HỆ THỐNG QUẢN LÝ CLB SINH VIÊN (ĐỀ TÀI 28)**
 ** **1. Phân hệ Xác thực & Phân quyền (Auth & RBAC)**
 *** 1.1 Đăng nhập Email & Mật khẩu Bcrypt
-*** 1.2 Cấp Access Token JWT 7 ngày
+*** 1.2 Cấp Access Token JWT 24h
 *** 1.3 Quản trị Phân quyền 3 Vai trò (Admin, Leader, Member)
 *** 1.4 Khóa / Mở khóa Tài khoản & Reset Mật khẩu
 
@@ -32,10 +32,10 @@ skinparam roundcorner 6
 *** 4.4 Kiểm soát Phân quyền RBAC Sửa Task (Chặn 403 Forbidden)
 *** 4.5 Đánh dấu Nghiệm thu Task & Lưu trữ Lịch sử
 
-** **5. Phân hệ Trợ lý AI & Báo cáo Thống kê**
-*** 5.1 FR-AI-01: AI Sinh Bài đăng Thông báo Sự kiện đa Tone
-*** 5.2 FR-AI-02: AI Tóm tắt Kết quả Hoạt động & Phản hồi 3 Phần
-*** 5.3 FR-AI-03: AI Smart Matchmaking Phân công Tự động
-*** 5.4 Dual-Engine Fallback: Local Rule Matcher khi Mất mạng
+** **5. Phân hệ Báo cáo Thống kê**
+*** 5.1 Gợi ý Phân công Nhiệm vụ Tự động
+*** 5.2 Sinh Bài đăng Thông báo Sự kiện đa Tone
+*** 5.3 Tóm tắt Kết quả Hoạt động & Phản hồi 3 Phần
+*** 5.4 Cơ chế Fallback chuyển Local Rule Matcher khi Mất mạng
 *** 5.5 Tính điểm Đóng góp (Contribution Score) & Leaderboard
 @endwbs
